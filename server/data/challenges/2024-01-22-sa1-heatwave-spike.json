@@ -1,0 +1,300 @@
+{
+  "id": "2024-01-22-sa1-heatwave-spike",
+  "date": "2024-01-22",
+  "title": "Heatwave Price Spike",
+  "description": "A 44°C day in Adelaide. Air conditioning demand overwhelms supply. Prices hit $5,000/MWh at 6pm.",
+  "difficulty": "hard",
+  "tags": [
+    "price_spike",
+    "heatwave",
+    "extreme_prices",
+    "summer"
+  ],
+  "battery": {
+    "duid": "TORRB1",
+    "name": "Torrens Island Battery",
+    "region": "SA1",
+    "maxMW": 250,
+    "maxStorageMWh": 250,
+    "roundTripEfficiency": 0.87,
+    "durationHours": 1
+  },
+  "initialSOCPercent": 80,
+  "intervals": [
+    {
+      "timestamp": "2024-01-22T00:00:00+10:30",
+      "hour": 0,
+      "predispatchPrice": 34.92,
+      "actualPrice": 35.01
+    },
+    {
+      "timestamp": "2024-01-22T01:00:00+10:30",
+      "hour": 1,
+      "predispatchPrice": 29.89,
+      "actualPrice": 28.42
+    },
+    {
+      "timestamp": "2024-01-22T02:00:00+10:30",
+      "hour": 2,
+      "predispatchPrice": 26.84,
+      "actualPrice": 29.86
+    },
+    {
+      "timestamp": "2024-01-22T03:00:00+10:30",
+      "hour": 3,
+      "predispatchPrice": 26.33,
+      "actualPrice": 27.42
+    },
+    {
+      "timestamp": "2024-01-22T04:00:00+10:30",
+      "hour": 4,
+      "predispatchPrice": 28.73,
+      "actualPrice": 26.2
+    },
+    {
+      "timestamp": "2024-01-22T05:00:00+10:30",
+      "hour": 5,
+      "predispatchPrice": 41.31,
+      "actualPrice": 33.47
+    },
+    {
+      "timestamp": "2024-01-22T06:00:00+10:30",
+      "hour": 6,
+      "predispatchPrice": 49.13,
+      "actualPrice": 54.78
+    },
+    {
+      "timestamp": "2024-01-22T07:00:00+10:30",
+      "hour": 7,
+      "predispatchPrice": 72.14,
+      "actualPrice": 65.79
+    },
+    {
+      "timestamp": "2024-01-22T08:00:00+10:30",
+      "hour": 8,
+      "predispatchPrice": 72,
+      "actualPrice": 71.58
+    },
+    {
+      "timestamp": "2024-01-22T09:00:00+10:30",
+      "hour": 9,
+      "predispatchPrice": 78.77,
+      "actualPrice": 70.1
+    },
+    {
+      "timestamp": "2024-01-22T10:00:00+10:30",
+      "hour": 10,
+      "predispatchPrice": 38.49,
+      "actualPrice": 49.02
+    },
+    {
+      "timestamp": "2024-01-22T11:00:00+10:30",
+      "hour": 11,
+      "predispatchPrice": 21.33,
+      "actualPrice": 21.44
+    },
+    {
+      "timestamp": "2024-01-22T12:00:00+10:30",
+      "hour": 12,
+      "predispatchPrice": 12.8,
+      "actualPrice": 13.59
+    },
+    {
+      "timestamp": "2024-01-22T13:00:00+10:30",
+      "hour": 13,
+      "predispatchPrice": 101.22,
+      "actualPrice": 85
+    },
+    {
+      "timestamp": "2024-01-22T14:00:00+10:30",
+      "hour": 14,
+      "predispatchPrice": 100.39,
+      "actualPrice": 120
+    },
+    {
+      "timestamp": "2024-01-22T15:00:00+10:30",
+      "hour": 15,
+      "predispatchPrice": 288.86,
+      "actualPrice": 250
+    },
+    {
+      "timestamp": "2024-01-22T16:00:00+10:30",
+      "hour": 16,
+      "predispatchPrice": 414.21,
+      "actualPrice": 450
+    },
+    {
+      "timestamp": "2024-01-22T17:00:00+10:30",
+      "hour": 17,
+      "predispatchPrice": 2646.16,
+      "actualPrice": 2200
+    },
+    {
+      "timestamp": "2024-01-22T18:00:00+10:30",
+      "hour": 18,
+      "predispatchPrice": 5227.46,
+      "actualPrice": 5200
+    },
+    {
+      "timestamp": "2024-01-22T19:00:00+10:30",
+      "hour": 19,
+      "predispatchPrice": 3965.1,
+      "actualPrice": 3800
+    },
+    {
+      "timestamp": "2024-01-22T20:00:00+10:30",
+      "hour": 20,
+      "predispatchPrice": 1733.36,
+      "actualPrice": 1500
+    },
+    {
+      "timestamp": "2024-01-22T21:00:00+10:30",
+      "hour": 21,
+      "predispatchPrice": 392.38,
+      "actualPrice": 350
+    },
+    {
+      "timestamp": "2024-01-22T22:00:00+10:30",
+      "hour": 22,
+      "predispatchPrice": 48.83,
+      "actualPrice": 59.32
+    },
+    {
+      "timestamp": "2024-01-22T23:00:00+10:30",
+      "hour": 23,
+      "predispatchPrice": 48.15,
+      "actualPrice": 44.8
+    }
+  ],
+  "batteryActual": [
+    {
+      "timestamp": "2024-01-22T00:00:00+10:30",
+      "hour": 0,
+      "mwOutput": 0
+    },
+    {
+      "timestamp": "2024-01-22T01:00:00+10:30",
+      "hour": 1,
+      "mwOutput": 0
+    },
+    {
+      "timestamp": "2024-01-22T02:00:00+10:30",
+      "hour": 2,
+      "mwOutput": 0
+    },
+    {
+      "timestamp": "2024-01-22T03:00:00+10:30",
+      "hour": 3,
+      "mwOutput": 0
+    },
+    {
+      "timestamp": "2024-01-22T04:00:00+10:30",
+      "hour": 4,
+      "mwOutput": 0
+    },
+    {
+      "timestamp": "2024-01-22T05:00:00+10:30",
+      "hour": 5,
+      "mwOutput": 0
+    },
+    {
+      "timestamp": "2024-01-22T06:00:00+10:30",
+      "hour": 6,
+      "mwOutput": 0
+    },
+    {
+      "timestamp": "2024-01-22T07:00:00+10:30",
+      "hour": 7,
+      "mwOutput": 0
+    },
+    {
+      "timestamp": "2024-01-22T08:00:00+10:30",
+      "hour": 8,
+      "mwOutput": 0
+    },
+    {
+      "timestamp": "2024-01-22T09:00:00+10:30",
+      "hour": 9,
+      "mwOutput": 0
+    },
+    {
+      "timestamp": "2024-01-22T10:00:00+10:30",
+      "hour": 10,
+      "mwOutput": 0
+    },
+    {
+      "timestamp": "2024-01-22T11:00:00+10:30",
+      "hour": 11,
+      "mwOutput": 0
+    },
+    {
+      "timestamp": "2024-01-22T12:00:00+10:30",
+      "hour": 12,
+      "mwOutput": 0
+    },
+    {
+      "timestamp": "2024-01-22T13:00:00+10:30",
+      "hour": 13,
+      "mwOutput": 0
+    },
+    {
+      "timestamp": "2024-01-22T14:00:00+10:30",
+      "hour": 14,
+      "mwOutput": 0
+    },
+    {
+      "timestamp": "2024-01-22T15:00:00+10:30",
+      "hour": 15,
+      "mwOutput": 0
+    },
+    {
+      "timestamp": "2024-01-22T16:00:00+10:30",
+      "hour": 16,
+      "mwOutput": 0
+    },
+    {
+      "timestamp": "2024-01-22T17:00:00+10:30",
+      "hour": 17,
+      "mwOutput": 0
+    },
+    {
+      "timestamp": "2024-01-22T18:00:00+10:30",
+      "hour": 18,
+      "mwOutput": 0
+    },
+    {
+      "timestamp": "2024-01-22T19:00:00+10:30",
+      "hour": 19,
+      "mwOutput": 0
+    },
+    {
+      "timestamp": "2024-01-22T20:00:00+10:30",
+      "hour": 20,
+      "mwOutput": 0
+    },
+    {
+      "timestamp": "2024-01-22T21:00:00+10:30",
+      "hour": 21,
+      "mwOutput": 0
+    },
+    {
+      "timestamp": "2024-01-22T22:00:00+10:30",
+      "hour": 22,
+      "mwOutput": 0
+    },
+    {
+      "timestamp": "2024-01-22T23:00:00+10:30",
+      "hour": 23,
+      "mwOutput": 0
+    }
+  ],
+  "metadata": {
+    "peakPrice": 5200,
+    "minPrice": 13.59,
+    "avgPrice": 607.74,
+    "priceSpread": 5186.41,
+    "negativeIntervals": 0,
+    "region": "SA1",
+    "season": "summer"
+  }
+}

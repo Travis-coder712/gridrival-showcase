@@ -1,0 +1,300 @@
+{
+  "id": "2024-07-12-sa1-winter-peaks",
+  "date": "2024-07-12",
+  "title": "Winter Morning & Evening Peaks",
+  "description": "Cold winter day with strong morning and evening demand peaks. Classic overnight-to-peak strategy.",
+  "difficulty": "easy",
+  "tags": [
+    "overnight_charge",
+    "morning_peak",
+    "evening_peak",
+    "winter"
+  ],
+  "battery": {
+    "duid": "TORRB1",
+    "name": "Torrens Island Battery",
+    "region": "SA1",
+    "maxMW": 250,
+    "maxStorageMWh": 250,
+    "roundTripEfficiency": 0.87,
+    "durationHours": 1
+  },
+  "initialSOCPercent": 40,
+  "intervals": [
+    {
+      "timestamp": "2024-07-12T00:00:00+10:30",
+      "hour": 0,
+      "predispatchPrice": 54.38,
+      "actualPrice": 50.04
+    },
+    {
+      "timestamp": "2024-07-12T01:00:00+10:30",
+      "hour": 1,
+      "predispatchPrice": 42.66,
+      "actualPrice": 43.24
+    },
+    {
+      "timestamp": "2024-07-12T02:00:00+10:30",
+      "hour": 2,
+      "predispatchPrice": 39.57,
+      "actualPrice": 42.85
+    },
+    {
+      "timestamp": "2024-07-12T03:00:00+10:30",
+      "hour": 3,
+      "predispatchPrice": 44.82,
+      "actualPrice": 47.45
+    },
+    {
+      "timestamp": "2024-07-12T04:00:00+10:30",
+      "hour": 4,
+      "predispatchPrice": 42.56,
+      "actualPrice": 42.78
+    },
+    {
+      "timestamp": "2024-07-12T05:00:00+10:30",
+      "hour": 5,
+      "predispatchPrice": 61.74,
+      "actualPrice": 62.24
+    },
+    {
+      "timestamp": "2024-07-12T06:00:00+10:30",
+      "hour": 6,
+      "predispatchPrice": 97.34,
+      "actualPrice": 95.93
+    },
+    {
+      "timestamp": "2024-07-12T07:00:00+10:30",
+      "hour": 7,
+      "predispatchPrice": 101.79,
+      "actualPrice": 105.58
+    },
+    {
+      "timestamp": "2024-07-12T08:00:00+10:30",
+      "hour": 8,
+      "predispatchPrice": 78.01,
+      "actualPrice": 80.83
+    },
+    {
+      "timestamp": "2024-07-12T09:00:00+10:30",
+      "hour": 9,
+      "predispatchPrice": 86.83,
+      "actualPrice": 85.7
+    },
+    {
+      "timestamp": "2024-07-12T10:00:00+10:30",
+      "hour": 10,
+      "predispatchPrice": 67.53,
+      "actualPrice": 63.24
+    },
+    {
+      "timestamp": "2024-07-12T11:00:00+10:30",
+      "hour": 11,
+      "predispatchPrice": 54.77,
+      "actualPrice": 56.41
+    },
+    {
+      "timestamp": "2024-07-12T12:00:00+10:30",
+      "hour": 12,
+      "predispatchPrice": 52.06,
+      "actualPrice": 53.32
+    },
+    {
+      "timestamp": "2024-07-12T13:00:00+10:30",
+      "hour": 13,
+      "predispatchPrice": 51.42,
+      "actualPrice": 50.43
+    },
+    {
+      "timestamp": "2024-07-12T14:00:00+10:30",
+      "hour": 14,
+      "predispatchPrice": 39.61,
+      "actualPrice": 39.71
+    },
+    {
+      "timestamp": "2024-07-12T15:00:00+10:30",
+      "hour": 15,
+      "predispatchPrice": 46.57,
+      "actualPrice": 46.39
+    },
+    {
+      "timestamp": "2024-07-12T16:00:00+10:30",
+      "hour": 16,
+      "predispatchPrice": 54.3,
+      "actualPrice": 55.79
+    },
+    {
+      "timestamp": "2024-07-12T17:00:00+10:30",
+      "hour": 17,
+      "predispatchPrice": 68.26,
+      "actualPrice": 73.38
+    },
+    {
+      "timestamp": "2024-07-12T18:00:00+10:30",
+      "hour": 18,
+      "predispatchPrice": 107.17,
+      "actualPrice": 100.62
+    },
+    {
+      "timestamp": "2024-07-12T19:00:00+10:30",
+      "hour": 19,
+      "predispatchPrice": 103.91,
+      "actualPrice": 114.6
+    },
+    {
+      "timestamp": "2024-07-12T20:00:00+10:30",
+      "hour": 20,
+      "predispatchPrice": 88.12,
+      "actualPrice": 94.93
+    },
+    {
+      "timestamp": "2024-07-12T21:00:00+10:30",
+      "hour": 21,
+      "predispatchPrice": 85.29,
+      "actualPrice": 77.87
+    },
+    {
+      "timestamp": "2024-07-12T22:00:00+10:30",
+      "hour": 22,
+      "predispatchPrice": 79.95,
+      "actualPrice": 74.71
+    },
+    {
+      "timestamp": "2024-07-12T23:00:00+10:30",
+      "hour": 23,
+      "predispatchPrice": 51.22,
+      "actualPrice": 55.22
+    }
+  ],
+  "batteryActual": [
+    {
+      "timestamp": "2024-07-12T00:00:00+10:30",
+      "hour": 0,
+      "mwOutput": 0
+    },
+    {
+      "timestamp": "2024-07-12T01:00:00+10:30",
+      "hour": 1,
+      "mwOutput": 0
+    },
+    {
+      "timestamp": "2024-07-12T02:00:00+10:30",
+      "hour": 2,
+      "mwOutput": 0
+    },
+    {
+      "timestamp": "2024-07-12T03:00:00+10:30",
+      "hour": 3,
+      "mwOutput": 0
+    },
+    {
+      "timestamp": "2024-07-12T04:00:00+10:30",
+      "hour": 4,
+      "mwOutput": 0
+    },
+    {
+      "timestamp": "2024-07-12T05:00:00+10:30",
+      "hour": 5,
+      "mwOutput": 0
+    },
+    {
+      "timestamp": "2024-07-12T06:00:00+10:30",
+      "hour": 6,
+      "mwOutput": 0
+    },
+    {
+      "timestamp": "2024-07-12T07:00:00+10:30",
+      "hour": 7,
+      "mwOutput": 0
+    },
+    {
+      "timestamp": "2024-07-12T08:00:00+10:30",
+      "hour": 8,
+      "mwOutput": 0
+    },
+    {
+      "timestamp": "2024-07-12T09:00:00+10:30",
+      "hour": 9,
+      "mwOutput": 0
+    },
+    {
+      "timestamp": "2024-07-12T10:00:00+10:30",
+      "hour": 10,
+      "mwOutput": 0
+    },
+    {
+      "timestamp": "2024-07-12T11:00:00+10:30",
+      "hour": 11,
+      "mwOutput": 0
+    },
+    {
+      "timestamp": "2024-07-12T12:00:00+10:30",
+      "hour": 12,
+      "mwOutput": 0
+    },
+    {
+      "timestamp": "2024-07-12T13:00:00+10:30",
+      "hour": 13,
+      "mwOutput": 0
+    },
+    {
+      "timestamp": "2024-07-12T14:00:00+10:30",
+      "hour": 14,
+      "mwOutput": 0
+    },
+    {
+      "timestamp": "2024-07-12T15:00:00+10:30",
+      "hour": 15,
+      "mwOutput": 0
+    },
+    {
+      "timestamp": "2024-07-12T16:00:00+10:30",
+      "hour": 16,
+      "mwOutput": 0
+    },
+    {
+      "timestamp": "2024-07-12T17:00:00+10:30",
+      "hour": 17,
+      "mwOutput": 0
+    },
+    {
+      "timestamp": "2024-07-12T18:00:00+10:30",
+      "hour": 18,
+      "mwOutput": 0
+    },
+    {
+      "timestamp": "2024-07-12T19:00:00+10:30",
+      "hour": 19,
+      "mwOutput": 0
+    },
+    {
+      "timestamp": "2024-07-12T20:00:00+10:30",
+      "hour": 20,
+      "mwOutput": 0
+    },
+    {
+      "timestamp": "2024-07-12T21:00:00+10:30",
+      "hour": 21,
+      "mwOutput": 0
+    },
+    {
+      "timestamp": "2024-07-12T22:00:00+10:30",
+      "hour": 22,
+      "mwOutput": 0
+    },
+    {
+      "timestamp": "2024-07-12T23:00:00+10:30",
+      "hour": 23,
+      "mwOutput": 0
+    }
+  ],
+  "metadata": {
+    "peakPrice": 114.6,
+    "minPrice": 39.71,
+    "avgPrice": 67.22,
+    "priceSpread": 74.89,
+    "negativeIntervals": 0,
+    "region": "SA1",
+    "season": "winter"
+  }
+}

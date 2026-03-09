@@ -1,0 +1,196 @@
+@import "tailwindcss";
+
+@theme {
+  --color-navy-50: #eef2f7;
+  --color-navy-100: #d4dce8;
+  --color-navy-200: #a9b9d1;
+  --color-navy-300: #7e96ba;
+  --color-navy-400: #5373a3;
+  --color-navy-500: #3a5a8c;
+  --color-navy-600: #2d4670;
+  --color-navy-700: #1f3254;
+  --color-navy-800: #1a365d;
+  --color-navy-900: #0f1f38;
+  --color-navy-950: #08101c;
+
+  --color-electric-50: #ebf5ff;
+  --color-electric-100: #d1e9ff;
+  --color-electric-200: #a3d3ff;
+  --color-electric-300: #75bdff;
+  --color-electric-400: #47a7ff;
+  --color-electric-500: #3182ce;
+  --color-electric-600: #2563a8;
+  --color-electric-700: #1a4482;
+
+  --color-profit: #38a169;
+  --color-loss: #e53e3e;
+  --color-warning: #d69e2e;
+
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+html {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+  min-height: 100vh;
+}
+
+/* Dark mode overrides for team screens */
+html.dark body {
+  background: linear-gradient(135deg, #0f1f38 0%, #1a365d 100%);
+  color: #e2e8f0;
+}
+
+html.dark .bg-gray-50 { background-color: #1a2744 !important; }
+html.dark .bg-white { background-color: #1f3254 !important; }
+html.dark .text-gray-800 { color: #e2e8f0 !important; }
+html.dark .text-gray-700 { color: #cbd5e0 !important; }
+html.dark .text-gray-600 { color: #a0aec0 !important; }
+html.dark .text-gray-500 { color: #718096 !important; }
+html.dark .text-gray-400 { color: #718096 !important; }
+html.dark .border-gray-200 { border-color: #2d4670 !important; }
+html.dark .border-gray-100 { border-color: #2d4670 !important; }
+html.dark .bg-gray-100 { background-color: #2d4670 !important; }
+html.dark .bg-gray-50 { background-color: #1f3254 !important; }
+html.dark .shadow-sm { box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important; }
+html.dark .shadow-md { box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4) !important; }
+
+/* Dark mode form inputs */
+html.dark input[type="number"],
+html.dark select {
+  background-color: #1a2744 !important;
+  color: #e2e8f0 !important;
+  border-color: #3a5a8c !important;
+}
+html.dark input[type="number"]::placeholder,
+html.dark select::placeholder {
+  color: #5373a3 !important;
+}
+
+/* Dark mode utility overrides for common patterns */
+html.dark .bg-blue-50 { background-color: rgba(49, 130, 206, 0.1) !important; }
+html.dark .bg-green-50 { background-color: rgba(56, 161, 105, 0.1) !important; }
+html.dark .bg-amber-50 { background-color: rgba(214, 158, 46, 0.1) !important; }
+html.dark .bg-red-50 { background-color: rgba(229, 62, 62, 0.1) !important; }
+html.dark .bg-purple-50 { background-color: rgba(128, 90, 213, 0.1) !important; }
+html.dark .bg-indigo-50 { background-color: rgba(99, 102, 241, 0.1) !important; }
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 6px;
+}
+::-webkit-scrollbar-thumb {
+  background: #a0aec0;
+  border-radius: 6px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #cbd5e0;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-width: auto;
+  scrollbar-color: #a0aec0 rgba(0, 0, 0, 0.1);
+}
+
+/* Number inputs without spinners */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* Animations */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(49, 130, 206, 0.4); }
+  50% { box-shadow: 0 0 0 8px rgba(49, 130, 206, 0); }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.4s ease-out;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s infinite;
+}
+
+/* Landing page animations */
+@keyframes ticker-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.ticker-scroll {
+  animation: ticker-scroll 60s linear infinite;
+}
+.ticker-scroll:hover {
+  animation-play-state: paused;
+}
+
+@keyframes glow-breathe {
+  0%, 100% { filter: drop-shadow(0 0 8px rgba(71, 167, 255, 0.4)) drop-shadow(0 0 20px rgba(71, 167, 255, 0.1)); }
+  50% { filter: drop-shadow(0 0 16px rgba(71, 167, 255, 0.7)) drop-shadow(0 0 40px rgba(71, 167, 255, 0.3)); }
+}
+
+.glow-pulse {
+  animation: glow-breathe 3s ease-in-out infinite;
+}
+
+/* Shimmer effect on buttons */
+.shimmer-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    110deg,
+    transparent 25%,
+    rgba(255, 255, 255, 0.06) 37%,
+    transparent 63%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 3s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% center; }
+  100% { background-position: -200% center; }
+}
+
+/* Print styles for game guide */
+@media print {
+  .no-print { display: none !important; }
+  body { background: white !important; color: black !important; }
+}
