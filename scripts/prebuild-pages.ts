@@ -35,11 +35,22 @@ const pages: Array<{ path: string; html: string }> = [
   { path: 'api/notes/vibe-coding/index.html', html: getVibeCodingNotesHTML() },
 ];
 
+// Mobile-friendly CSS injected before </head> to prevent horizontal overflow
+const mobileFixCSS = `<style>
+  html { overflow-x: hidden; }
+  body { overflow-x: hidden; max-width: 100vw; }
+  table { display: block; overflow-x: auto; max-width: 100%; }
+  pre, .staircase { overflow-x: auto; max-width: 100%; }
+  img { max-width: 100%; height: auto; }
+</style>`;
+
 for (const page of pages) {
   const outPath = resolve(PUBLIC, page.path);
   mkdirSync(dirname(outPath), { recursive: true });
-  writeFileSync(outPath, page.html, 'utf-8');
-  console.log(`  [pages] ${page.path} (${(page.html.length / 1024).toFixed(1)} KB)`);
+  // Inject mobile fix CSS before </head>
+  const html = page.html.replace('</head>', mobileFixCSS + '\n</head>');
+  writeFileSync(outPath, html, 'utf-8');
+  console.log(`  [pages] ${page.path} (${(html.length / 1024).toFixed(1)} KB)`);
 }
 
 console.log(`[prebuild-pages] Generated ${pages.length} static HTML pages.`);

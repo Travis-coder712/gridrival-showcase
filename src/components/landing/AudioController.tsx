@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { useAudio } from '../../hooks/useAudio';
 
 export default function AudioController() {
-  const { isPlaying, toggle } = useAudio('/audio/ambient-trading.mp3', true);
+  const { isPlaying, toggle } = useAudio(`${import.meta.env.BASE_URL}audio/ambient-trading.mp3`, true);
 
   return (
     <motion.button
