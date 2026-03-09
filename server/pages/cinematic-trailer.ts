@@ -940,7 +940,7 @@ export function getCinematicTrailerHTML(): string {
       <div class="finale-logo">&#9889;</div>
       <div class="finale-title">GridRival</div>
       <div class="finale-tagline">Understand the market by playing it</div>
-      <button class="cta-button" onclick="window.location.href='/'">Launch the Game &rarr;</button>
+      <button class="cta-button" onclick="window.location.href='/gridrival-showcase/'">Back to Showcase &rarr;</button>
       <div class="finale-meta">
         Up to 15 teams &bull; 5 game modes &bull; 7 asset types &bull; Real NEM scenarios<br>
         Sound effects &bull; Dark mode &bull; Works on phones &bull; No installation required<br><br>
@@ -980,6 +980,7 @@ export function getCinematicTrailerHTML(): string {
   <button class="ctrl-btn" id="btnRestart" title="Restart">&#8634;</button>
   <button class="ctrl-btn" id="btnPause" title="Pause / Play">&#10074;&#10074;</button>
   <button class="ctrl-btn" id="btnSkip" title="Skip to end">&#9654;&#9654;</button>
+  <button class="ctrl-btn" id="btnFullscreen" title="Fullscreen">&#x26F6;</button>
 </div>
 
 <script>
@@ -1538,6 +1539,25 @@ export function getCinematicTrailerHTML(): string {
     tick();
   });
 
+  document.getElementById('btnFullscreen').addEventListener('click', () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+      document.getElementById('btnFullscreen').innerHTML = '&#x2716;';
+      document.getElementById('btnFullscreen').title = 'Exit Fullscreen';
+    } else {
+      document.exitFullscreen();
+      document.getElementById('btnFullscreen').innerHTML = '&#x26F6;';
+      document.getElementById('btnFullscreen').title = 'Fullscreen';
+    }
+  });
+
+  document.addEventListener('fullscreenchange', () => {
+    if (!document.fullscreenElement) {
+      document.getElementById('btnFullscreen').innerHTML = '&#x26F6;';
+      document.getElementById('btnFullscreen').title = 'Fullscreen';
+    }
+  });
+
   // Keyboard controls (only active after trailer starts)
   document.addEventListener('keydown', (e) => {
     if (!started) return;
@@ -1555,6 +1575,8 @@ export function getCinematicTrailerHTML(): string {
       pauseOffset = getElapsed() + 5000;
       startTime = Date.now();
       if (!paused) { cancelAnimationFrame(animFrame); tick(); }
+    } else if (e.code === 'KeyF') {
+      document.getElementById('btnFullscreen').click();
     } else if (e.code === 'ArrowLeft') {
       // Skip back 5 seconds
       pauseOffset = Math.max(0, getElapsed() - 5000);
