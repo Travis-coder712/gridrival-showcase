@@ -20,6 +20,7 @@ import { getCinematicTrailerHTML } from '../server/pages/cinematic-trailer.ts';
 import { getEducationalCompendiumHTML } from '../server/pages/educational-compendium.ts';
 import { getEnhancementConceptsHTML } from '../server/pages/enhancement-concepts.ts';
 import { getTransmissionEducationHTML } from '../server/pages/transmission-education.ts';
+import { getLearnNemHTML } from '../server/pages/learn-nem.ts';
 
 // Use directory/index.html so /api/pre-read resolves without .html extension
 const pages: Array<{ path: string; html: string }> = [
@@ -29,6 +30,7 @@ const pages: Array<{ path: string; html: string }> = [
   { path: 'api/educational-compendium/index.html', html: getEducationalCompendiumHTML() },
   { path: 'api/enhancement-concepts/index.html', html: getEnhancementConceptsHTML() },
   { path: 'api/transmission-education/index.html', html: getTransmissionEducationHTML() },
+  { path: 'api/learn-nem/index.html', html: getLearnNemHTML() },
   { path: 'api/trailer/index.html', html: getCinematicTrailerHTML() },
   { path: 'api/recommended-improvements/index.html', html: getRecommendedImprovementsHTML() },
   { path: 'api/notes/technical/index.html', html: getTechnicalNotesHTML() },

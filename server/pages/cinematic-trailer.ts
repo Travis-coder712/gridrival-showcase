@@ -674,13 +674,71 @@ export function getCinematicTrailerHTML(): string {
   @media (max-width: 640px) {
     .feature-grid {
       grid-template-columns: repeat(2, 1fr);
-      gap: 0.8rem;
+      gap: 0.6rem;
     }
-    .feature-card { padding: 0.8rem; }
-    .stats-bar { gap: 1.5rem; }
-    .vibe-stats { gap: 1.5rem; }
-    .step-row { gap: 1rem; }
-    .step-number { width: 38px; height: 38px; font-size: 1rem; }
+    .feature-card { padding: 0.7rem; }
+    .feature-icon { font-size: 1.4rem; margin-bottom: 0.3rem; }
+    .feature-label { font-size: 0.65rem; }
+    .feature-desc { font-size: 0.6rem; }
+    .stats-bar { gap: 1rem; }
+    .vibe-stats { gap: 1rem; }
+    .step-row { gap: 0.8rem; margin-bottom: 1rem; }
+    .step-number { width: 34px; height: 34px; font-size: 0.9rem; }
+    .step-content h3 { font-size: 0.9rem; }
+    .step-content p { font-size: 0.75rem; }
+
+    /* Screenshot grid — 2 columns on mobile */
+    .screenshot-grid {
+      gap: 0.6rem;
+      max-width: 100%;
+      width: 92%;
+    }
+    .screenshot-frame {
+      width: 150px;
+      height: 100px;
+    }
+    .screenshot-frame iframe {
+      width: 1200px;
+      height: 800px;
+      transform: scale(0.125);
+    }
+    .screenshot-label { font-size: 0.55rem; }
+
+    /* Vibe coding section */
+    .vibe-section { padding: 0 1rem; }
+    .vibe-badge { font-size: 0.6rem; padding: 0.3rem 0.8rem; }
+    .vibe-desc { font-size: 0.75rem !important; }
+    .prompt-demo {
+      padding: 0.7rem 1rem;
+      font-size: 0.65rem;
+    }
+    .result-text { font-size: 0.7rem !important; }
+    .vibe-stat-value { font-size: 1.2rem !important; }
+    .vibe-stat-label { font-size: 0.55rem; }
+
+    /* Finale */
+    .finale-logo { font-size: 2.5rem; }
+    .finale-meta { font-size: 0.6rem; }
+    .cta-button { padding: 0.7rem 2rem; font-size: 0.85rem; }
+
+    /* Controls */
+    .controls {
+      bottom: 10px;
+      right: 10px;
+      gap: 5px;
+    }
+    .ctrl-btn { width: 30px; height: 30px; font-size: 0.8rem; }
+
+    /* Headlines */
+    .headline { margin-bottom: 0.8rem; }
+    .headline-source { font-size: 0.6rem; }
+
+    /* Ticker */
+    .ticker-bar { height: 28px; bottom: 44px; }
+    .ticker-content { font-size: 0.6rem; }
+
+    /* Scenes need safe padding to avoid controls overlap */
+    .scene { padding: 0.5rem; }
   }
 </style>
 </head>
@@ -813,39 +871,39 @@ export function getCinematicTrailerHTML(): string {
     <div class="screenshot-grid">
       <div class="screenshot-card" id="ss-0">
         <div class="screenshot-frame">
-          <iframe src="/" loading="lazy" sandbox="allow-scripts allow-same-origin" scrolling="no"></iframe>
+          <iframe src="/gridrival-showcase/api/gameplay-summary/" loading="lazy" sandbox="allow-scripts allow-same-origin" scrolling="no"></iframe>
         </div>
-        <div class="screenshot-label">&#9889; Landing Page &mdash; cinematic energy-market theme</div>
+        <div class="screenshot-label">&#128214; Gameplay Summary &mdash; rules, strategy &amp; asset-type bidding</div>
       </div>
       <div class="screenshot-card" id="ss-1">
         <div class="screenshot-frame">
-          <iframe src="/host" loading="lazy" sandbox="allow-scripts allow-same-origin" scrolling="no"></iframe>
+          <iframe src="/gridrival-showcase/api/educational-compendium/" loading="lazy" sandbox="allow-scripts allow-same-origin" scrolling="no"></iframe>
         </div>
-        <div class="screenshot-label">&#127918; Game Setup &mdash; configure teams, assets &amp; scenarios</div>
+        <div class="screenshot-label">&#127891; Educational Compendium &mdash; comprehensive NEM learning</div>
       </div>
       <div class="screenshot-card" id="ss-2">
         <div class="screenshot-frame">
-          <iframe src="/battery-test" loading="lazy" sandbox="allow-scripts allow-same-origin" scrolling="no"></iframe>
+          <iframe src="/gridrival-showcase/api/transmission-education/" loading="lazy" sandbox="allow-scripts allow-same-origin" scrolling="no"></iframe>
         </div>
-        <div class="screenshot-label">&#128267; Battery Minigame &mdash; charge &amp; discharge for maximum profit</div>
+        <div class="screenshot-label">&#9889; Transmission Education &mdash; how the grid connects</div>
       </div>
       <div class="screenshot-card" id="ss-3">
         <div class="screenshot-frame">
-          <iframe src="/guides" loading="lazy" sandbox="allow-scripts allow-same-origin" scrolling="no"></iframe>
-        </div>
-        <div class="screenshot-label">&#128218; Guides Hub &mdash; strategy, gameplay &amp; background material</div>
-      </div>
-      <div class="screenshot-card" id="ss-4">
-        <div class="screenshot-frame">
-          <iframe src="/api/learn-nem" loading="lazy" sandbox="allow-scripts allow-same-origin" scrolling="no"></iframe>
+          <iframe src="/gridrival-showcase/api/learn-nem/" loading="lazy" sandbox="allow-scripts allow-same-origin" scrolling="no"></iframe>
         </div>
         <div class="screenshot-label">&#128161; Learn the NEM &mdash; interactive educational slides</div>
       </div>
+      <div class="screenshot-card" id="ss-4">
+        <div class="screenshot-frame">
+          <iframe src="/gridrival-showcase/api/pre-read/" loading="lazy" sandbox="allow-scripts allow-same-origin" scrolling="no"></iframe>
+        </div>
+        <div class="screenshot-label">&#128218; Pre-read Guide &mdash; essential background material</div>
+      </div>
       <div class="screenshot-card" id="ss-5">
         <div class="screenshot-frame">
-          <iframe src="/api/gameplay-summary" loading="lazy" sandbox="allow-scripts allow-same-origin" scrolling="no"></iframe>
+          <iframe src="/gridrival-showcase/api/enhancement-concepts/" loading="lazy" sandbox="allow-scripts allow-same-origin" scrolling="no"></iframe>
         </div>
-        <div class="screenshot-label">&#128214; Gameplay Summary &mdash; rules, strategy &amp; asset-type bidding</div>
+        <div class="screenshot-label">&#128640; Enhancement Concepts &mdash; future game features</div>
       </div>
     </div>
   </div>

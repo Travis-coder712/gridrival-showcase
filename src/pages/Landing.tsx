@@ -3,7 +3,6 @@ import { motion } from 'framer-motion';
 import ParticleGrid from '../components/landing/ParticleGrid';
 import PhotoCarousel from '../components/landing/PhotoCarousel';
 import EnergyTicker from '../components/landing/EnergyTicker';
-import AudioController from '../components/landing/AudioController';
 import StatsCounter from '../components/landing/StatsCounter';
 
 export default function Landing() {
@@ -174,8 +173,6 @@ export default function Landing() {
         </div>
       </div>
 
-      {/* Layer 4: Audio controller */}
-      <AudioController />
     </div>
   );
 }

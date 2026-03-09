@@ -1,5 +1,6 @@
 import { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
+import AudioController from './components/landing/AudioController';
 
 // Eagerly load the landing page (first paint)
 import Landing from './pages/Landing';
@@ -27,19 +28,22 @@ function LoadingSpinner() {
 
 export default function App() {
   return (
-    <Suspense fallback={<LoadingSpinner />}>
-      <Routes>
-        <Route path="/" element={<Landing />} />
-        <Route path="/guide" element={<GameGuide />} />
-        <Route path="/guides" element={<GuidesPage />} />
-        <Route path="/battery-test" element={<BatteryTest />} />
-        <Route path="/retail-minigame" element={<RetailMinigame />} />
-        <Route path="/hedging-minigame" element={<HedgingMinigame />} />
-        <Route path="/investment-minigame" element={<InvestmentMinigame />} />
-        <Route path="/battery-forecast" element={<BatteryForecast />} />
-        <Route path="/energy-mix" element={<EnergyMixGame />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </Suspense>
+    <>
+      <Suspense fallback={<LoadingSpinner />}>
+        <Routes>
+          <Route path="/" element={<Landing />} />
+          <Route path="/guide" element={<GameGuide />} />
+          <Route path="/guides" element={<GuidesPage />} />
+          <Route path="/battery-test" element={<BatteryTest />} />
+          <Route path="/retail-minigame" element={<RetailMinigame />} />
+          <Route path="/hedging-minigame" element={<HedgingMinigame />} />
+          <Route path="/investment-minigame" element={<InvestmentMinigame />} />
+          <Route path="/battery-forecast" element={<BatteryForecast />} />
+          <Route path="/energy-mix" element={<EnergyMixGame />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Suspense>
+      <AudioController />
+    </>
   );
 }
