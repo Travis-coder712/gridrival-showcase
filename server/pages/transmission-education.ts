@@ -112,7 +112,7 @@ export function getTransmissionEducationHTML(): string {
 <body>
 
 <div class="no-print">
-  <a href="/guides">&larr; Back to Guides</a>
+  <a href="/gridrival-showcase/">&larr; Back to Game</a>
   <button onclick="window.print()">Print / Save as PDF</button>
 </div>
 
