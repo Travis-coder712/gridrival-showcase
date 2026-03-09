@@ -65,7 +65,7 @@ export function getRecommendedImprovementsHTML(): string {
 <body>
 <div class="container">
   <div class="no-print" style="display: flex; justify-content: space-between; align-items: center;">
-    <a href="/" class="back-link">&larr; Back to Game</a>
+    <a href="/gridrival-showcase/" class="back-link">&larr; Back to Game</a>
     <button class="print-btn" onclick="window.print()">Print / Save as PDF</button>
   </div>
 

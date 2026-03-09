@@ -140,7 +140,7 @@ export function getLearnNemHTML(): string {
 <body>
 
 <div class="no-print">
-  <a href="/">&larr; Back to Game</a>
+  <a href="/gridrival-showcase/">&larr; Back to Game</a>
   <button onclick="window.print()">Print / Save as PDF</button>
 </div>
 

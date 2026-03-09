@@ -210,7 +210,7 @@ export function getGameplaySummaryHTML(): string {
 <div class="container">
 
   <div class="top-bar">
-    <a class="back-link" href="/">&larr; Back to GridRival</a>
+    <a class="back-link" href="/gridrival-showcase/">&larr; Back to GridRival</a>
     <button class="print-btn" onclick="window.print()">Print / Save as PDF</button>
   </div>
 
