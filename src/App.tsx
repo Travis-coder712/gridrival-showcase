@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import AudioController from './components/landing/AudioController';
+import VersionBadge from './components/VersionBadge';
 
 // Eagerly load the landing page (first paint)
 import Landing from './pages/Landing';
@@ -44,6 +45,7 @@ export default function App() {
         </Routes>
       </Suspense>
       <AudioController />
+      <VersionBadge />
     </>
   );
 }

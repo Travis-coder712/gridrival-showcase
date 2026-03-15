@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "prebuild": "tsx scripts/prebuild-pages.ts && tsx scripts/prebuild-challenges.ts",
+    "prebuild": "tsx scripts/bump-version.ts && tsx scripts/prebuild-pages.ts && tsx scripts/prebuild-challenges.ts",
     "dev": "vite",
     "build": "npm run prebuild && vite build",
     "preview": "vite preview"
