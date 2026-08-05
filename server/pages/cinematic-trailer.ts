@@ -1,6 +1,6 @@
 /**
- * GridRival cinematic trailer (v4 - longer diagram dwell, battery headline,
- * dark finale + gold CTA, "real penalties"). Procedurally scored; served at /api/trailer.
+ * GridRival cinematic trailer (v5 - sustained backing, staggered CTA,
+ * "real penalties" at the base). Procedurally scored; served at /api/trailer.
  */
 export function getCinematicTrailerHTML(): string {
   return `<!doctype html>
@@ -87,18 +87,18 @@ export function getCinematicTrailerHTML(): string {
 
   .sect-title { font-size: clamp(22px,4vw,44px); font-weight: 900; letter-spacing: -.02em; margin-bottom: 20px; }
   .sect-title .accent { color: var(--electric-2); }
-  .sect-title .pen { color: var(--loss); opacity: 0; transition: opacity .5s ease; text-shadow: 0 0 24px rgba(255,75,87,.45); }
-  .sect-title .pen.on { opacity: 1; }
+  .pen-line { margin-top: 32px; font-size: clamp(28px,5.4vw,60px); font-weight: 900; letter-spacing: -.02em; color: var(--loss); text-shadow: 0 0 30px rgba(255,75,87,.5); opacity: 0; transform: translateY(16px); transition: opacity .5s ease, transform .5s cubic-bezier(.2,1.3,.3,1); }
+  .pen-line.on { opacity: 1; transform: none; }
 
   /* call to action */
   #scene-cta { background: radial-gradient(circle at 50% 40%, rgba(255,207,92,.08), transparent 60%); }
-  .cta-label { font-family: var(--mono); font-size: clamp(12px,2vw,17px); letter-spacing: .5em; text-transform: uppercase; color: var(--gold); opacity: 0; }
+  .cta-label { font-family: var(--mono); font-size: clamp(15px,2.6vw,24px); letter-spacing: .5em; text-transform: uppercase; color: var(--gold); opacity: 0; }
   .cta-label.visible { animation: fadeUp .6s ease forwards; }
   .cta-title { font-size: clamp(44px,10vw,120px); font-weight: 900; letter-spacing: -.03em; margin-top: 14px; opacity: 0; }
   .cta-title.visible { animation: slamIn .6s cubic-bezier(.2,1.3,.3,1) forwards; }
   .cta-event { font-size: clamp(20px,3.6vw,40px); font-weight: 800; margin-top: 18px; opacity: 0; }
   .cta-event.visible { animation: fadeUp .7s ease forwards; }
-  .cta-date { display: block; font-family: var(--mono); font-size: clamp(14px,2vw,20px); letter-spacing: .22em; text-transform: uppercase; color: var(--gold); margin-top: 12px; }
+  .cta-date { display: block; font-family: var(--mono); font-size: clamp(17px,2.8vw,28px); letter-spacing: .22em; text-transform: uppercase; color: var(--gold); margin-top: 12px; }
 
   .turn-1 { font-size: clamp(22px,4.4vw,50px); font-weight: 800; color: var(--muted); opacity: 0; animation: fadeUp .6s .1s ease forwards; max-width: min(900px,92vw); text-wrap: balance; }
   .turn-2 { font-size: clamp(30px,7vw,84px); font-weight: 900; letter-spacing: -.02em; color: #fff; opacity: 0; animation: slamIn .6s .9s cubic-bezier(.2,1.3,.3,1) forwards; margin-top: 10px; }
@@ -335,12 +335,13 @@ export function getCinematicTrailerHTML(): string {
 
   <!-- REAL RULES -->
   <div class="scene" id="scene-rules">
-    <div class="sect-title">Real market. <span class="accent">Real rules.</span> <span class="pen" id="realPen">Real penalties.</span></div>
+    <div class="sect-title">Real market. <span class="accent">Real rules.</span></div>
     <div class="rules-row">
       <div class="rule" id="rl-0"><div class="ric">&#9878;&#65039;</div><div class="rt">AER investigations</div><div class="rd">Withhold or bid at the cap in a shortage — and get fined</div></div>
       <div class="rule" id="rl-1"><div class="ric">&#128267;</div><div class="rt">Demand response</div><div class="rd">Call on load and storage to defend a position — at a cost</div></div>
       <div class="rule" id="rl-2"><div class="ric">&#127788;&#65039;</div><div class="rt">Predispatch imprecision</div><div class="rd">The forecast lies. Demand surprises. So do the outages</div></div>
     </div>
+    <div class="pen-line" id="realPen">Real penalties.</div>
   </div>
 
   <!-- summary -->
@@ -386,7 +387,7 @@ export function getCinematicTrailerHTML(): string {
     <div class="bolt">&#9889;</div>
     <div class="st-brand glow-electric">GRIDRIVAL</div>
     <div class="st-play">&#9654; Play Trailer</div>
-    <div class="st-note">with sound &middot; ~90 seconds</div>
+    <div class="st-note">with sound &middot; ~95 seconds</div>
   </div>
 </div>
 
@@ -455,7 +456,10 @@ export function getCinematicTrailerHTML(): string {
   }
   function startEpic() {
     if (currentMood === 'epic') return; stopAllMusic(); currentMood='epic';
-    playDrone(98,30,'sawtooth',0.02); playDrone(146.83,30,'triangle',0.02); playDrone(196,30,'sine',0.02);
+    const layPad = () => { playDrone(98,26,'sawtooth',0.022); playDrone(146.83,26,'triangle',0.022); playDrone(196,26,'sine',0.02); };
+    layPad();
+    // Re-lay the sustained pad so the backing never drops out across the long expansion act.
+    const pad = setInterval(() => { if (musicMuted || currentMood !== 'epic') { clearInterval(pad); return; } layPad(); }, 22000); musicIntervals.push(pad);
     let step = 0; const drive = setInterval(() => { if (musicMuted||currentMood!=='epic'){clearInterval(drive);return;} playNote(49,0.12,'sine',0.14); if (step%2===1) playNote(9000,0.02,'square',0.02); step++; }, 300); musicIntervals.push(drive);
     const anthem = [146.83,220,293.66,349.23,440,349.23,293.66,220]; let ai = 0;
     const arp = setInterval(() => { if (musicMuted||currentMood!=='epic'){clearInterval(arp);return;} playNote(anthem[ai%anthem.length],0.24,'triangle',0.05); if (ai%8===0) playNote(anthem[ai%anthem.length]*2,0.4,'square',0.02); ai++; }, 300); musicIntervals.push(arp);
@@ -475,7 +479,7 @@ export function getCinematicTrailerHTML(): string {
   }
 
   // ===== timeline =====
-  const TOTAL_DURATION = 90000;
+  const TOTAL_DURATION = 95000;
   let startTime = Date.now(), paused = false, pauseOffset = 0, animFrame, executed = new Set();
 
   const timeline = [
@@ -554,11 +558,11 @@ export function getCinematicTrailerHTML(): string {
     [83500, () => { showEl('ft-2'); playImpact(); }],
     [84300, () => showEl('ft-3')],
 
-    // CALL TO ACTION — uplifting pings land here
+    // CALL TO ACTION — uplifting pings land here; lines arrive one at a time, "Come play." last
     [86500, () => { showScene('cta'); playRiser(1.2); startTriumphant(); }],
-    [87300, () => showEl('cta-0')],
-    [87800, () => showEl('cta-1')],
-    [88400, () => showEl('cta-2')],
+    [87500, () => showEl('cta-0')],   // PLAY IT FOR REAL
+    [89400, () => showEl('cta-2')],   // GridRival · PD Team Day / September 1
+    [91600, () => { showEl('cta-1'); playImpact(); }],   // Come play.  (the punch, last)
   ];
 
   function getElapsed() { return paused ? pauseOffset : Date.now() - startTime + pauseOffset; }
