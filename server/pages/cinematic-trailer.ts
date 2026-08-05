@@ -1,6 +1,6 @@
 /**
- * GridRival cinematic trailer (v3 - Merit Order + Full Position, with mechanic pages).
- * Procedurally scored via Web Audio; self-contained HTML. Served at /api/trailer.
+ * GridRival cinematic trailer (v4 - longer diagram dwell, battery headline,
+ * dark finale + gold CTA, "real penalties"). Procedurally scored; served at /api/trailer.
  */
 export function getCinematicTrailerHTML(): string {
   return `<!doctype html>
@@ -87,6 +87,18 @@ export function getCinematicTrailerHTML(): string {
 
   .sect-title { font-size: clamp(22px,4vw,44px); font-weight: 900; letter-spacing: -.02em; margin-bottom: 20px; }
   .sect-title .accent { color: var(--electric-2); }
+  .sect-title .pen { color: var(--loss); opacity: 0; transition: opacity .5s ease; text-shadow: 0 0 24px rgba(255,75,87,.45); }
+  .sect-title .pen.on { opacity: 1; }
+
+  /* call to action */
+  #scene-cta { background: radial-gradient(circle at 50% 40%, rgba(255,207,92,.08), transparent 60%); }
+  .cta-label { font-family: var(--mono); font-size: clamp(12px,2vw,17px); letter-spacing: .5em; text-transform: uppercase; color: var(--gold); opacity: 0; }
+  .cta-label.visible { animation: fadeUp .6s ease forwards; }
+  .cta-title { font-size: clamp(44px,10vw,120px); font-weight: 900; letter-spacing: -.03em; margin-top: 14px; opacity: 0; }
+  .cta-title.visible { animation: slamIn .6s cubic-bezier(.2,1.3,.3,1) forwards; }
+  .cta-event { font-size: clamp(20px,3.6vw,40px); font-weight: 800; margin-top: 18px; opacity: 0; }
+  .cta-event.visible { animation: fadeUp .7s ease forwards; }
+  .cta-date { display: block; font-family: var(--mono); font-size: clamp(14px,2vw,20px); letter-spacing: .22em; text-transform: uppercase; color: var(--gold); margin-top: 12px; }
 
   .turn-1 { font-size: clamp(22px,4.4vw,50px); font-weight: 800; color: var(--muted); opacity: 0; animation: fadeUp .6s .1s ease forwards; max-width: min(900px,92vw); text-wrap: balance; }
   .turn-2 { font-size: clamp(30px,7vw,84px); font-weight: 900; letter-spacing: -.02em; color: #fff; opacity: 0; animation: slamIn .6s .9s cubic-bezier(.2,1.3,.3,1) forwards; margin-top: 10px; }
@@ -213,6 +225,7 @@ export function getCinematicTrailerHTML(): string {
     <div class="headline" id="hl-2"><span class="src">Market Wire</span>A retailer <span class="red">collapses</span> — caught short in the spike</div>
     <div class="headline" id="hl-3"><span class="src">Regulator</span>The <span class="amber">AER</span> opens an investigation into bidding conduct</div>
     <div class="headline" id="hl-4"><span class="src">The Grid, 2030</span>Coal exits. Renewables surge. <span class="elec">Volatility is the new normal.</span></div>
+    <div class="headline" id="hl-5"><span class="src">Market Structure</span>New batteries <span class="elec">crush the duck curve</span> — and the spread with it</div>
   </div>
 
   <!-- Phase 1 title -->
@@ -322,7 +335,7 @@ export function getCinematicTrailerHTML(): string {
 
   <!-- REAL RULES -->
   <div class="scene" id="scene-rules">
-    <div class="sect-title">Real market. <span class="accent">Real rules.</span></div>
+    <div class="sect-title">Real market. <span class="accent">Real rules.</span> <span class="pen" id="realPen">Real penalties.</span></div>
     <div class="rules-row">
       <div class="rule" id="rl-0"><div class="ric">&#9878;&#65039;</div><div class="rt">AER investigations</div><div class="rd">Withhold or bid at the cap in a shortage — and get fined</div></div>
       <div class="rule" id="rl-1"><div class="ric">&#128267;</div><div class="rt">Demand response</div><div class="rd">Call on load and storage to defend a position — at a cost</div></div>
@@ -350,6 +363,13 @@ export function getCinematicTrailerHTML(): string {
     <div class="finale-sub" id="ft-3" style="margin-top:10px">Bid &middot; Position &middot; Hedge &middot; Survive</div>
   </div>
 
+  <!-- call to action -->
+  <div class="scene" id="scene-cta">
+    <div class="cta-label" id="cta-0">Play it for real</div>
+    <div class="cta-title" id="cta-1">Come play.</div>
+    <div class="cta-event" id="cta-2"><span class="glow-gold">GridRival</span> &middot; PD Team Day<span class="cta-date">September 1</span></div>
+  </div>
+
   <div class="ticker-bar"><div class="ticker-content" id="tickerContent"></div></div>
 
   <div class="controls">
@@ -366,7 +386,7 @@ export function getCinematicTrailerHTML(): string {
     <div class="bolt">&#9889;</div>
     <div class="st-brand glow-electric">GRIDRIVAL</div>
     <div class="st-play">&#9654; Play Trailer</div>
-    <div class="st-note">with sound &middot; ~75 seconds</div>
+    <div class="st-note">with sound &middot; ~90 seconds</div>
   </div>
 </div>
 
@@ -447,9 +467,15 @@ export function getCinematicTrailerHTML(): string {
     setTimeout(()=>{ if(currentMood!=='triumphant')return; playDrone(261.63,8,'sine',0.025); playDrone(329.63,8,'triangle',0.02); playDrone(392,8,'sine',0.02); },4000);
     let fs=0; const fp=setInterval(()=>{ if(musicMuted||currentMood!=='triumphant'){clearInterval(fp);return;} if(fs%2===0) playNote(65.41,0.15,'sine',0.08); fs++; },500); musicIntervals.push(fp);
   }
+  // dark, ominous bed for the "companies go bust... Will you?" finale (NOT triumphant)
+  function startFinaleTension() {
+    if (currentMood === 'finale') return; stopAllMusic(); currentMood='finale';
+    playRumble(12, 0.1); playDrone(58, 12, 'sawtooth', 0.03); playImpact();
+    let b=0; const h=setInterval(()=>{ if(musicMuted||currentMood!=='finale'){clearInterval(h);return;} playNote(41,0.22,'sine',0.1); setTimeout(()=>playNote(39,0.18,'sine',0.06),220); b++; }, 1700); musicIntervals.push(h);
+  }
 
   // ===== timeline =====
-  const TOTAL_DURATION = 74000;
+  const TOTAL_DURATION = 90000;
   let startTime = Date.now(), paused = false, pauseOffset = 0, animFrame, executed = new Set();
 
   const timeline = [
@@ -465,65 +491,74 @@ export function getCinematicTrailerHTML(): string {
     [8300, () => { showHeadline(3); flashRed(); }],
     [10000, () => hideHeadline(3)],
     [10400, () => showHeadline(4)],
-    [12600, () => hideHeadline(4)],
+    [12200, () => hideHeadline(4)],
+    [12600, () => { showHeadline(5); playImpact(); }],
+    [14400, () => hideHeadline(5)],
 
-    [13200, () => { showScene(2); playWhoosh(); startTrading(); }],
-    [16400, () => { showScene(3); playWhoosh(); }],
-    [16900, () => document.getElementById('moWrap').classList.add('go')],
-    [18200, () => { document.getElementById('moClear').classList.add('on'); playImpact(); }],
-    [18800, () => document.getElementById('moCap').classList.add('on')],
+    [15000, () => { showScene(2); playWhoosh(); startTrading(); }],
+    [18400, () => { showScene(3); playWhoosh(); }],
+    [18900, () => document.getElementById('moWrap').classList.add('go')],
+    [20200, () => { document.getElementById('moClear').classList.add('on'); playImpact(); }],
+    [20800, () => document.getElementById('moCap').classList.add('on')],
 
-    [22200, () => { showScene(4); playWhoosh(); }],
-    [22700, () => showEl('fc-0')], [23050, () => showEl('fc-1')], [23400, () => { showEl('fc-2'); playImpact(); }], [23750, () => showEl('fc-3')], [24100, () => showEl('fc-4')],
+    [26000, () => { showScene(4); playWhoosh(); }],
+    [26500, () => showEl('fc-0')], [26850, () => showEl('fc-1')], [27200, () => { showEl('fc-2'); playImpact(); }], [27550, () => showEl('fc-3')], [27900, () => showEl('fc-4')],
 
-    [26600, () => { showScene(5); playWhoosh(); }],
-    [27500, () => playImpact()],
+    [31500, () => { showScene(5); playWhoosh(); }],
+    [32400, () => playImpact()],
 
-    [29200, () => { showScene(6); playRiser(1.2); startEpic(); }],
+    [34500, () => { showScene(6); playRiser(1.2); startEpic(); }],
 
-    // BASIS
-    [32400, () => { showScene('basis'); playWhoosh(); }],
-    [33000, () => { document.getElementById('basisRow').classList.add('go'); document.getElementById('saP').textContent = '$155'; document.getElementById('saP').style.color = 'var(--sa)'; document.getElementById('linkStat').textContent = 'FULL'; }],
-    [34200, () => { document.getElementById('basisBadge').classList.add('on'); playImpact(); }],
-    [34800, () => document.getElementById('basisCap').classList.add('on')],
+    // BASIS (longer dwell)
+    [38000, () => { showScene('basis'); playWhoosh(); }],
+    [38600, () => { document.getElementById('basisRow').classList.add('go'); document.getElementById('saP').textContent = '$155'; document.getElementById('saP').style.color = 'var(--sa)'; document.getElementById('linkStat').textContent = 'FULL'; }],
+    [39800, () => { document.getElementById('basisBadge').classList.add('on'); playImpact(); }],
+    [40400, () => document.getElementById('basisCap').classList.add('on')],
 
     // CAPS
-    [38200, () => { showScene('caps'); playWhoosh(); }],
-    [38700, () => { const s = document.getElementById('capSpot'); let v = 80; const t = setInterval(() => { v += 90; if (v >= 620) { v = 620; clearInterval(t); } s.textContent = '$' + v; }, 130); }],
-    [40100, () => { document.getElementById('capPay').classList.add('on'); playChime(660); }],
-    [40700, () => document.getElementById('capDeal').classList.add('on')],
-    [41300, () => document.getElementById('capsCap').classList.add('on')],
+    [45500, () => { showScene('caps'); playWhoosh(); }],
+    [46000, () => { const s = document.getElementById('capSpot'); let v = 80; const t = setInterval(() => { v += 90; if (v >= 620) { v = 620; clearInterval(t); } s.textContent = '$' + v; }, 130); }],
+    [47400, () => { document.getElementById('capPay').classList.add('on'); playChime(660); }],
+    [48000, () => document.getElementById('capDeal').classList.add('on')],
+    [48600, () => document.getElementById('capsCap').classList.add('on')],
 
     // LOAD SHAPE + DR
-    [44700, () => { showScene('load'); playWhoosh(); }],
-    [45200, () => document.getElementById('loadStage').classList.add('go')],
-    [46600, () => playChime(523)],
-    [47000, () => document.getElementById('loadCap').classList.add('on')],
+    [53500, () => { showScene('load'); playWhoosh(); }],
+    [54000, () => document.getElementById('loadStage').classList.add('go')],
+    [55400, () => playChime(523)],
+    [55800, () => document.getElementById('loadCap').classList.add('on')],
 
     // ELECTRIFICATION
-    [50400, () => { showScene('elec'); playWhoosh(); }],
-    [50900, () => document.getElementById('elecStage').classList.add('go')],
-    [52600, () => playChime(784)],
-    [52900, () => document.getElementById('elecCap').classList.add('on')],
+    [60500, () => { showScene('elec'); playWhoosh(); }],
+    [61000, () => document.getElementById('elecStage').classList.add('go')],
+    [62700, () => playChime(784)],
+    [63000, () => document.getElementById('elecCap').classList.add('on')],
 
-    // REAL RULES
-    [56200, () => { showScene('rules'); playWhoosh(); }],
-    [56700, () => showEl('rl-0')], [57200, () => showEl('rl-1')], [57700, () => { showEl('rl-2'); playImpact(); }],
+    // REAL RULES + penalties
+    [68000, () => { showScene('rules'); playWhoosh(); }],
+    [68500, () => showEl('rl-0')], [69000, () => showEl('rl-1')], [69500, () => { showEl('rl-2'); playImpact(); }],
+    [71200, () => { document.getElementById('realPen').classList.add('on'); playImpact(); }],
 
     // SUMMARY
-    [60800, () => { showScene(8); playWhoosh(); }],
-    [61100, () => { showEl('vb-0'); playNote(392,0.12,'triangle',0.08); }],
-    [61600, () => { showEl('vb-1'); playNote(523,0.12,'triangle',0.08); }],
-    [62100, () => { showEl('vb-2'); playNote(659,0.12,'triangle',0.08); }],
-    [62600, () => { showEl('vb-3'); playImpact(); }],
-    [63200, () => { for (let i=0;i<9;i++) setTimeout(()=>showEl('ch-'+i), i*110); }],
+    [73800, () => { showScene(8); playWhoosh(); }],
+    [74100, () => { showEl('vb-0'); playNote(392,0.12,'triangle',0.08); }],
+    [74600, () => { showEl('vb-1'); playNote(523,0.12,'triangle',0.08); }],
+    [75100, () => { showEl('vb-2'); playNote(659,0.12,'triangle',0.08); }],
+    [75600, () => { showEl('vb-3'); playImpact(); }],
+    [76200, () => { for (let i=0;i<9;i++) setTimeout(()=>showEl('ch-'+i), i*110); }],
 
-    // FINALE
-    [67200, () => { showScene(9); playRiser(1.4); startTriumphant(); }],
-    [67900, () => showEl('ft-0')],
-    [69400, () => { showEl('ft-1'); playImpact(); }],
-    [70600, () => { showEl('ft-2'); playImpact(); }],
-    [71400, () => showEl('ft-3')],
+    // FINALE — dark and tense (fanfare moves to the CTA)
+    [80000, () => { showScene(9); startFinaleTension(); }],
+    [80800, () => showEl('ft-0')],
+    [82300, () => { showEl('ft-1'); playImpact(); }],
+    [83500, () => { showEl('ft-2'); playImpact(); }],
+    [84300, () => showEl('ft-3')],
+
+    // CALL TO ACTION — uplifting pings land here
+    [86500, () => { showScene('cta'); playRiser(1.2); startTriumphant(); }],
+    [87300, () => showEl('cta-0')],
+    [87800, () => showEl('cta-1')],
+    [88400, () => showEl('cta-2')],
   ];
 
   function getElapsed() { return paused ? pauseOffset : Date.now() - startTime + pauseOffset; }
@@ -543,7 +578,8 @@ export function getCinematicTrailerHTML(): string {
   document.getElementById('btnPause').addEventListener('click', () => { if (paused) { paused = false; startTime = Date.now(); document.getElementById('btnPause').innerHTML = '&#10074;&#10074;'; tick(); } else { paused = true; pauseOffset = getElapsed(); document.getElementById('btnPause').innerHTML = '&#9654;'; cancelAnimationFrame(animFrame); stopAllMusic(); } });
   function resetVisuals() {
     document.querySelectorAll('.headline').forEach(el => el.classList.remove('visible','fade-out'));
-    document.querySelectorAll('.fcard,.verb,.chip,.finale-tag,.finale-brand,.finale-sub,.rule').forEach(el => el.classList.remove('visible'));
+    document.querySelectorAll('.fcard,.verb,.chip,.finale-tag,.finale-brand,.finale-sub,.rule,.cta-label,.cta-title,.cta-event').forEach(el => el.classList.remove('visible'));
+    document.getElementById('realPen').classList.remove('on');
     document.getElementById('moWrap').classList.remove('go'); document.getElementById('moClear').classList.remove('on'); document.getElementById('moCap').classList.remove('on');
     document.getElementById('basisRow').classList.remove('go'); document.getElementById('basisBadge').classList.remove('on'); document.getElementById('basisCap').classList.remove('on');
     document.getElementById('saP').textContent = '$33'; document.getElementById('saP').style.color = ''; document.getElementById('linkStat').textContent = 'flowing';
@@ -553,7 +589,7 @@ export function getCinematicTrailerHTML(): string {
     document.getElementById('redFlash').style.opacity = '0';
   }
   document.getElementById('btnRestart').addEventListener('click', () => { stopAllMusic(); executed.clear(); pauseOffset = 0; paused = false; startTime = Date.now(); document.getElementById('btnPause').innerHTML = '&#10074;&#10074;'; resetVisuals(); document.getElementById('progressBar').style.width = '0%'; cancelAnimationFrame(animFrame); tick(); });
-  document.getElementById('btnSkip').addEventListener('click', () => { pauseOffset = 67200; startTime = Date.now(); paused = false; executed.clear(); document.getElementById('btnPause').innerHTML = '&#10074;&#10074;'; cancelAnimationFrame(animFrame); tick(); });
+  document.getElementById('btnSkip').addEventListener('click', () => { pauseOffset = 80000; startTime = Date.now(); paused = false; executed.clear(); document.getElementById('btnPause').innerHTML = '&#10074;&#10074;'; cancelAnimationFrame(animFrame); tick(); });
   document.getElementById('btnFullscreen').addEventListener('click', () => { if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{}); else document.exitFullscreen(); });
   document.addEventListener('keydown', (e) => {
     if (!started) return; initAudio();
