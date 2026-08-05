@@ -1,1059 +1,351 @@
 /**
- * Cinematic Trailer — GridRival
- * A movie-trailer-style HTML presentation that auto-plays through timed scenes.
- * Served at /api/trailer
- *
- * Act 1 (0–11s): Dramatic energy market crisis — Bloomberg-style headlines, menacing tone
- * Act 2 (11–32s): Game reveal — what it is, how it works, key features
- * Act 3 (32–40s): Vibe coding story — how it was built
- * Finale (40–48s): Call to action
+ * GridRival cinematic trailer (v2 - "Full Position").
+ * Procedurally scored via Web Audio (no audio files); self-contained HTML.
+ * Served at /api/trailer. Rebuild the showcase to redeploy.
  */
 export function getCinematicTrailerHTML(): string {
-  return `<!DOCTYPE html>
+  return `<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>GridRival — Trailer</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
-  /* ===== RESET & BASE ===== */
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   :root {
-    --navy-950: #08101c;
-    --navy-900: #0f1f38;
-    --navy-800: #1a365d;
-    --navy-700: #1f3254;
-    --navy-300: #7e96ba;
-    --electric-400: #47a7ff;
-    --electric-300: #75bdff;
-    --electric-500: #3182ce;
-    --profit: #38a169;
-    --loss: #e53e3e;
-    --warning: #d69e2e;
-    --gold: #f6e05e;
+    --bg: #05070e;
+    --panel: #0b1120;
+    --ink: #eaf1fb;
+    --muted: #8ba0bf;
+    --electric: #34a1ff;
+    --electric-2: #6fc3ff;
+    --loss: #ff4b57;
+    --profit: #34d399;
+    --warning: #f5b53d;
+    --gold: #ffd469;
+    --mono: 'SF Mono','JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;
+    --sans: 'SF Pro Display',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
   }
-
-  html, body {
-    height: 100%;
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
     overflow: hidden;
-    background: var(--navy-950);
-    color: #e2e8f0;
-    font-family: 'Inter', system-ui, sans-serif;
-  }
-
-  /* ===== STAGE ===== */
-  .stage {
     position: fixed;
     inset: 0;
-    overflow: hidden;
   }
+  #stage { position: absolute; inset: 0; overflow: hidden; }
 
-  /* ===== SCENES ===== */
+  /* faint grid backdrop */
+  #stage::before {
+    content: ""; position: absolute; inset: 0; opacity: .35; pointer-events: none;
+    background-image:
+      linear-gradient(rgba(52,161,255,.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(52,161,255,.06) 1px, transparent 1px);
+    background-size: 44px 44px;
+    animation: gridDrift 20s linear infinite;
+  }
+  @keyframes gridDrift { to { background-position: 44px 44px; } }
+
   .scene {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.8s ease;
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    opacity: 0; visibility: hidden; padding: 4vh 5vw; text-align: center;
+    transition: opacity .5s ease;
   }
-  .scene.active {
-    opacity: 1;
-    pointer-events: auto;
-  }
+  .scene.active { opacity: 1; visibility: visible; }
 
-  /* ===== BACKGROUND LAYERS ===== */
-  .bg-grid {
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    background:
-      linear-gradient(rgba(71, 167, 255, 0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(71, 167, 255, 0.03) 1px, transparent 1px);
-    background-size: 60px 60px;
-    animation: gridPulse 4s ease-in-out infinite;
-  }
-  @keyframes gridPulse {
-    0%, 100% { opacity: 0.3; }
-    50% { opacity: 0.7; }
-  }
-  @keyframes pulsePlay {
-    0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(71,167,255,0.4); }
-    50% { transform: scale(1.08); box-shadow: 0 0 30px 10px rgba(71,167,255,0.15); }
-  }
+  /* ---------- red flash ---------- */
+  #redFlash { position: absolute; inset: 0; background: radial-gradient(circle, rgba(255,60,70,.5), transparent 70%); opacity: 0; pointer-events: none; z-index: 40; }
+  #redFlash.flash { animation: flashPulse .5s ease-out; }
+  @keyframes flashPulse { 0% { opacity: .8; } 100% { opacity: 0; } }
 
-  .bg-vignette {
-    position: fixed;
-    inset: 0;
-    z-index: 1;
-    background: radial-gradient(ellipse at center, transparent 30%, var(--navy-950) 80%);
-    pointer-events: none;
+  /* ---------- cold open ---------- */
+  .bolt {
+    font-size: clamp(80px, 18vw, 240px); line-height: 1;
+    filter: drop-shadow(0 0 40px var(--electric));
+    animation: boltFlicker 2.4s ease-in-out infinite;
   }
+  @keyframes boltFlicker { 0%,100%{opacity:.9} 45%{opacity:.5} 50%{opacity:1} 55%{opacity:.6} }
 
-  /* ===== ACT 1: ENERGY CRISIS ===== */
-  .headlines-container {
-    position: relative;
-    width: 100%;
-    max-width: 900px;
-    z-index: 5;
-  }
-
+  /* ---------- headlines ---------- */
+  .kicker { font-family: var(--mono); font-size: clamp(11px,1.5vw,14px); letter-spacing: .35em; text-transform: uppercase; color: var(--loss); }
   .headline {
-    opacity: 0;
-    transform: translateY(30px);
-    text-align: center;
-    margin-bottom: 1.2rem;
-    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    position: absolute; max-width: 92vw;
+    font-size: clamp(28px, 6vw, 74px); font-weight: 800; line-height: 1.02; letter-spacing: -.02em;
+    opacity: 0; transform: translateY(28px) scale(.98); text-wrap: balance;
+    transition: opacity .35s ease, transform .35s ease;
   }
-  .headline.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  .headline.fade-out {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
+  .headline.visible { opacity: 1; transform: translateY(0) scale(1); }
+  .headline.fade-out { opacity: 0; transform: translateY(-24px) scale(1.02); }
+  .headline .src { display:block; font-family: var(--mono); font-size: clamp(10px,1.3vw,13px); font-weight: 500; letter-spacing:.2em; color: var(--muted); text-transform: uppercase; margin-bottom: 14px; }
+  .headline .red { color: var(--loss); }
+  .headline .amber { color: var(--warning); }
+  .headline .elec { color: var(--electric-2); }
 
-  .headline-text {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: clamp(1rem, 2.5vw, 1.6rem);
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    line-height: 1.4;
-  }
+  /* ---------- title cards ---------- */
+  .phase-label { font-family: var(--mono); font-size: clamp(12px,2vw,18px); letter-spacing: .5em; text-transform: uppercase; color: var(--electric); margin-bottom: 18px; opacity: 0; animation: fadeUp .7s .1s ease forwards; }
+  .brand { font-size: clamp(40px, 10vw, 132px); font-weight: 900; letter-spacing: -.03em; line-height: .92; }
+  .brand .sub { display:block; font-size: .42em; font-weight: 800; letter-spacing: .02em; margin-top: 8px; }
+  .title-reveal .brand { opacity: 0; animation: slamIn .6s .15s cubic-bezier(.2,1.3,.3,1) forwards; }
+  .glow-electric { color: #fff; text-shadow: 0 0 50px rgba(52,161,255,.75), 0 0 120px rgba(52,161,255,.35); }
+  .glow-gold { color: #fff; text-shadow: 0 0 50px rgba(255,207,92,.7), 0 0 130px rgba(255,207,92,.35); }
+  .tagline-lead { font-size: clamp(18px,3.4vw,38px); font-weight: 700; opacity: 0; animation: fadeUp .7s .5s ease forwards; }
+  @keyframes fadeUp { from { opacity:0; transform: translateY(22px);} to { opacity:1; transform:none; } }
+  @keyframes slamIn { 0%{opacity:0; transform: scale(2.4); filter: blur(8px);} 60%{opacity:1; transform: scale(.94); filter:blur(0);} 100%{opacity:1; transform: scale(1);} }
 
-  .headline-source {
-    font-size: 0.7rem;
-    color: var(--navy-300);
-    font-weight: 400;
-    margin-top: 0.2rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-  }
+  /* ---------- merit order diagram ---------- */
+  .diagram { width: min(880px, 92vw); }
+  .diagram h3 { font-family: var(--mono); font-size: clamp(11px,1.6vw,15px); letter-spacing:.3em; text-transform: uppercase; color: var(--electric); margin-bottom: 18px; }
+  .mo-wrap { position: relative; height: min(46vh, 360px); border-left: 2px solid rgba(255,255,255,.18); border-bottom: 2px solid rgba(255,255,255,.18); display: flex; align-items: flex-end; gap: 6px; padding: 0 4px; }
+  .mo-axis-y { position:absolute; left: -46px; top: -6px; font-family: var(--mono); font-size: 11px; color: var(--muted); }
+  .mo-axis-x { position:absolute; right: 0; bottom: -24px; font-family: var(--mono); font-size: 11px; color: var(--muted); }
+  .mo-bar { flex: 1; background: var(--c); border-radius: 4px 4px 0 0; height: 0; transition: height .6s cubic-bezier(.2,.8,.2,1); box-shadow: inset 0 0 0 1px rgba(255,255,255,.08); position: relative; }
+  .mo-bar .lab { position:absolute; top:-20px; left:0; right:0; font-family: var(--mono); font-size: 10px; color: var(--muted); opacity:0; transition: opacity .4s; }
+  .mo-wrap.go .mo-bar { height: var(--h); }
+  .mo-wrap.go .mo-bar .lab { opacity: 1; }
+  .mo-demand { position:absolute; top:0; bottom:0; width: 3px; background: repeating-linear-gradient(var(--loss) 0 8px, transparent 8px 14px); left: 100%; opacity: 0; transition: left 1s ease .4s, opacity .4s ease .4s; }
+  .mo-wrap.go .mo-demand { left: 62%; opacity: 1; }
+  .mo-demand .dl { position:absolute; top: 6px; left: 8px; font-family: var(--mono); font-size: 11px; color: var(--loss); white-space: nowrap; }
+  .mo-clear { position:absolute; left:0; right:0; height: 2px; background: var(--gold); box-shadow: 0 0 18px var(--gold); opacity: 0; bottom: 0; transition: bottom .6s ease 1.2s, opacity .4s ease 1.2s; }
+  .mo-clear.on { opacity: 1; }
+  .mo-clear .price { position:absolute; right: 6px; top: -30px; font-family: var(--mono); font-weight: 800; font-size: clamp(16px,2.6vw,26px); color: var(--gold); text-shadow: 0 0 20px rgba(255,207,92,.6); }
+  .mo-caption { margin-top: 40px; font-size: clamp(13px,1.8vw,17px); color: var(--muted); opacity: 0; transition: opacity .5s ease; }
+  .mo-caption.on { opacity: 1; }
+  .mo-caption b { color: var(--ink); }
 
-  .hl-red { color: var(--loss); }
-  .hl-amber { color: var(--warning); }
-  .hl-green { color: var(--profit); }
-  .hl-blue { color: var(--electric-400); }
-  .hl-white { color: #ffffff; }
+  /* ---------- feature cards ---------- */
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; width: min(1000px, 94vw); }
+  .fcard {
+    background: linear-gradient(180deg, rgba(52,161,255,.08), rgba(11,17,32,.6));
+    border: 1px solid rgba(52,161,255,.22); border-radius: 16px; padding: 20px 16px;
+    opacity: 0; transform: translateY(24px) scale(.96); transition: opacity .45s ease, transform .45s ease;
+  }
+  .fcard.visible { opacity: 1; transform: none; }
+  .fcard .ic { font-size: 30px; margin-bottom: 8px; }
+  .fcard .t { font-weight: 800; font-size: clamp(15px,2vw,19px); letter-spacing: -.01em; }
+  .fcard .d { font-size: clamp(11px,1.4vw,13px); color: var(--muted); margin-top: 4px; line-height: 1.35; }
+  .fcard.danger { border-color: rgba(255,75,87,.3); background: linear-gradient(180deg, rgba(255,75,87,.1), rgba(11,17,32,.6)); }
+  .fcard.warn { border-color: rgba(245,181,61,.3); background: linear-gradient(180deg, rgba(245,181,61,.1), rgba(11,17,32,.6)); }
+  .fcard.gold { border-color: rgba(255,207,92,.35); background: linear-gradient(180deg, rgba(255,207,92,.12), rgba(11,17,32,.6)); }
 
-  /* Ticker bar at bottom of Act 1 */
-  .ticker-bar {
-    position: absolute;
-    bottom: 60px;
-    left: 0;
-    right: 0;
-    height: 36px;
-    background: rgba(15, 31, 56, 0.9);
-    border-top: 1px solid rgba(71, 167, 255, 0.2);
-    border-bottom: 1px solid rgba(71, 167, 255, 0.2);
-    overflow: hidden;
-    z-index: 10;
-  }
+  .sect-title { font-size: clamp(22px,4vw,44px); font-weight: 900; letter-spacing: -.02em; margin-bottom: 20px; }
+  .sect-title .accent { color: var(--electric-2); }
 
-  .ticker-content {
-    display: flex;
-    align-items: center;
-    height: 100%;
-    white-space: nowrap;
-    animation: tickerScroll 30s linear infinite;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.75rem;
-  }
+  /* the turn */
+  .turn-1 { font-size: clamp(22px,4.6vw,52px); font-weight: 800; color: var(--muted); opacity: 0; animation: fadeUp .6s .1s ease forwards; }
+  .turn-2 { font-size: clamp(30px,7vw,84px); font-weight: 900; letter-spacing: -.02em; color: #fff; opacity: 0; animation: slamIn .6s .9s cubic-bezier(.2,1.3,.3,1) forwards; }
 
-  .ticker-item {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 0 24px;
-  }
+  /* summary montage */
+  .verbs { display:flex; gap: clamp(10px,3vw,40px); flex-wrap: wrap; justify-content: center; margin-bottom: 26px; }
+  .verb { font-size: clamp(24px,5vw,60px); font-weight: 900; letter-spacing: -.02em; opacity: 0; }
+  .verb.visible { animation: slamIn .5s cubic-bezier(.2,1.3,.3,1) forwards; }
+  .verb.v0 { color: var(--electric-2); } .verb.v1 { color: var(--profit); }
+  .verb.v2 { color: var(--warning); } .verb.v3 { color: var(--loss); }
+  .chips { display:flex; flex-wrap: wrap; gap: 8px; justify-content: center; max-width: min(900px,94vw); }
+  .chip { font-family: var(--mono); font-size: clamp(10px,1.3vw,13px); border: 1px solid rgba(255,255,255,.16); border-radius: 999px; padding: 6px 13px; color: var(--muted); opacity: 0; transform: translateY(10px); transition: opacity .3s, transform .3s; }
+  .chip.visible { opacity: 1; transform: none; color: var(--ink); }
 
-  .ticker-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-  .ticker-dot.red { background: var(--loss); }
-  .ticker-dot.green { background: var(--profit); }
-  .ticker-dot.amber { background: var(--warning); }
+  /* finale */
+  .finale-tag { font-size: clamp(18px,3.2vw,34px); font-weight: 700; opacity: 0; }
+  .finale-tag.visible { animation: fadeUp .7s ease forwards; }
+  .finale-tag .dim { color: var(--muted); }
+  .finale-brand { font-size: clamp(52px,13vw,168px); font-weight: 900; letter-spacing: -.04em; opacity: 0; }
+  .finale-brand.visible { animation: slamIn .7s cubic-bezier(.2,1.3,.3,1) forwards; }
+  .finale-sub { font-family: var(--mono); font-size: clamp(11px,1.8vw,16px); letter-spacing: .3em; text-transform: uppercase; color: var(--electric); opacity: 0; }
+  .finale-sub.visible { animation: fadeUp .7s ease forwards; }
 
-  .ticker-price {
-    font-weight: 700;
-  }
-  .ticker-up { color: var(--loss); }
-  .ticker-down { color: var(--profit); }
+  /* ---------- ticker ---------- */
+  .ticker-bar { position: absolute; left: 0; right: 0; bottom: 46px; height: 34px; background: rgba(4,7,14,.9); border-top: 1px solid rgba(52,161,255,.25); border-bottom: 1px solid rgba(52,161,255,.15); overflow: hidden; z-index: 30; display: flex; align-items: center; }
+  .ticker-content { display: inline-flex; white-space: nowrap; animation: tickerScroll 34s linear infinite; }
+  .ti { display: inline-flex; align-items: center; gap: 7px; padding: 0 22px; font-family: var(--mono); font-size: 12px; color: var(--muted); }
+  .dot { width: 7px; height: 7px; border-radius: 50%; }
+  .dot.r { background: var(--loss); } .dot.g { background: var(--profit); } .dot.a { background: var(--warning); } .dot.b { background: var(--electric); }
+  .up { color: var(--loss); } .down { color: var(--profit); } .num { color: var(--ink); }
+  @keyframes tickerScroll { from { transform: translateX(0);} to { transform: translateX(-50%);} }
 
-  @keyframes tickerScroll {
-    from { transform: translateX(0); }
-    to { transform: translateX(-50%); }
-  }
+  /* ---------- controls ---------- */
+  .controls { position: absolute; left: 0; right: 0; bottom: 0; height: 46px; background: rgba(4,7,14,.95); border-top: 1px solid rgba(255,255,255,.08); display: flex; align-items: center; gap: 8px; padding: 0 12px; z-index: 50; }
+  .controls button { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); color: var(--ink); border-radius: 8px; width: 32px; height: 30px; cursor: pointer; font-size: 14px; display: inline-flex; align-items: center; justify-content: center; }
+  .controls button:hover { background: rgba(52,161,255,.2); border-color: var(--electric); }
+  .progress-track { flex: 1; height: 4px; background: rgba(255,255,255,.1); border-radius: 3px; overflow: hidden; }
+  #progressBar { height: 100%; width: 0; background: linear-gradient(90deg, var(--electric), var(--electric-2)); }
+  .hint { font-family: var(--mono); font-size: 10px; color: var(--muted); letter-spacing: .05em; }
 
-  /* Red flash overlay for dramatic effect */
-  .red-flash {
-    position: fixed;
-    inset: 0;
-    background: rgba(229, 62, 62, 0.15);
-    z-index: 2;
-    opacity: 0;
-    pointer-events: none;
-  }
-  .red-flash.flash {
-    animation: flashPulse 0.8s ease-out;
-  }
-  @keyframes flashPulse {
-    0% { opacity: 0.4; }
-    100% { opacity: 0; }
-  }
+  /* ---------- start overlay ---------- */
+  #startOverlay { position: absolute; inset: 0; z-index: 100; background: radial-gradient(circle at 50% 40%, #0b1428, #05070e 70%); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; }
+  #startOverlay .bolt { animation: boltFlicker 2.4s ease-in-out infinite; }
+  #startOverlay .st-brand { font-size: clamp(44px,11vw,120px); font-weight: 900; letter-spacing: -.03em; margin-top: 4px; }
+  #startOverlay .st-play { margin-top: 26px; font-family: var(--mono); letter-spacing: .25em; text-transform: uppercase; font-size: 13px; color: var(--electric); border: 1px solid rgba(52,161,255,.4); border-radius: 999px; padding: 12px 26px; animation: pulsePlay 2s ease-in-out infinite; }
+  #startOverlay .st-note { margin-top: 16px; font-size: 12px; color: var(--muted); }
+  @keyframes pulsePlay { 0%,100%{ box-shadow: 0 0 0 0 rgba(52,161,255,.3);} 50%{ box-shadow: 0 0 0 12px rgba(52,161,255,0);} }
 
-  /* ===== TRANSITION: THE QUESTION ===== */
-  .big-question {
-    font-family: 'Inter', sans-serif;
-    font-size: clamp(1.6rem, 4vw, 3rem);
-    font-weight: 800;
-    text-align: center;
-    color: #ffffff;
-    text-shadow: 0 0 40px rgba(71, 167, 255, 0.3);
-    padding: 0 2rem;
-    line-height: 1.3;
-  }
-
-  .big-question .em {
-    color: var(--electric-400);
-    font-style: italic;
-  }
-
-  /* ===== ACT 2: GAME REVEAL ===== */
-  .reveal-title {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: clamp(1.8rem, 5vw, 3.5rem);
-    font-weight: 700;
-    text-align: center;
-    color: #ffffff;
-    margin-bottom: 0.5rem;
-    text-shadow: 0 0 60px rgba(71, 167, 255, 0.4);
-    letter-spacing: -0.03em;
-  }
-
-  .reveal-subtitle {
-    font-size: clamp(0.9rem, 2vw, 1.2rem);
-    color: var(--electric-300);
-    text-align: center;
-    font-weight: 300;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    margin-bottom: 2.5rem;
-  }
-
-  .feature-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.2rem;
-    max-width: 800px;
-    width: 90%;
-    margin: 0 auto;
-  }
-
-  .feature-card {
-    background: rgba(15, 31, 56, 0.6);
-    border: 1px solid rgba(71, 167, 255, 0.15);
-    border-radius: 12px;
-    padding: 1.2rem;
-    text-align: center;
-    opacity: 0;
-    transform: translateY(20px) scale(0.95);
-    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-    backdrop-filter: blur(10px);
-  }
-  .feature-card.visible {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-
-  .feature-icon {
-    font-size: 2rem;
-    margin-bottom: 0.5rem;
-  }
-
-  .feature-label {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--electric-300);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    margin-bottom: 0.3rem;
-  }
-
-  .feature-desc {
-    font-size: 0.75rem;
-    color: var(--navy-300);
-    line-height: 1.4;
-  }
-
-  /* How it works steps */
-  .steps-container {
-    max-width: 750px;
-    width: 90%;
-    margin: 0 auto;
-  }
-
-  .step-row {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-    margin-bottom: 1.5rem;
-    opacity: 0;
-    transform: translateX(-30px);
-    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-  .step-row.visible {
-    opacity: 1;
-    transform: translateX(0);
-  }
-  .step-row.from-right {
-    transform: translateX(30px);
-  }
-  .step-row.from-right.visible {
-    transform: translateX(0);
-  }
-
-  .step-number {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--electric-500), var(--electric-400));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: white;
-    flex-shrink: 0;
-  }
-
-  .step-content h3 {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: #ffffff;
-    margin-bottom: 0.2rem;
-  }
-
-  .step-content p {
-    font-size: 0.85rem;
-    color: var(--navy-300);
-    line-height: 1.4;
-  }
-
-  /* Stats bar */
-  .stats-bar {
-    display: flex;
-    justify-content: center;
-    gap: 3rem;
-    margin-top: 2rem;
-    flex-wrap: wrap;
-  }
-
-  .stat {
-    text-align: center;
-    opacity: 0;
-    transform: scale(0.8);
-    transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-  .stat.visible {
-    opacity: 1;
-    transform: scale(1);
-  }
-
-  .stat-value {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: clamp(1.5rem, 4vw, 2.5rem);
-    font-weight: 700;
-    color: var(--electric-400);
-  }
-
-  .stat-label {
-    font-size: 0.7rem;
-    color: var(--navy-300);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    margin-top: 0.2rem;
-  }
-
-  /* ===== ACT 3: VIBE CODING ===== */
-  .vibe-section {
-    text-align: center;
-    max-width: 700px;
-    padding: 0 2rem;
-  }
-
-  .vibe-badge {
-    display: inline-block;
-    padding: 0.4rem 1.2rem;
-    background: rgba(128, 90, 213, 0.2);
-    border: 1px solid rgba(128, 90, 213, 0.4);
-    border-radius: 20px;
-    font-size: 0.7rem;
-    font-weight: 600;
-    color: #b794f4;
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
-    margin-bottom: 1.5rem;
-  }
-
-  .vibe-title {
-    font-size: clamp(1.4rem, 3.5vw, 2.2rem);
-    font-weight: 800;
-    color: #ffffff;
-    margin-bottom: 1rem;
-    line-height: 1.3;
-  }
-
-  .vibe-desc {
-    font-size: clamp(0.85rem, 1.5vw, 1rem);
-    color: var(--navy-300);
-    line-height: 1.6;
-    margin-bottom: 2rem;
-  }
-
-  .vibe-stats {
-    display: flex;
-    justify-content: center;
-    gap: 2.5rem;
-    flex-wrap: wrap;
-  }
-
-  .vibe-stat {
-    text-align: center;
-    opacity: 0;
-    transition: all 0.5s ease;
-  }
-  .vibe-stat.visible {
-    opacity: 1;
-  }
-
-  .vibe-stat-value {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 1.6rem;
-    font-weight: 700;
-  }
-  .vibe-stat-value.purple { color: #b794f4; }
-  .vibe-stat-value.blue { color: var(--electric-400); }
-  .vibe-stat-value.green { color: var(--profit); }
-
-  .vibe-stat-label {
-    font-size: 0.65rem;
-    color: var(--navy-300);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    margin-top: 0.2rem;
-  }
-
-  /* Prompt animation */
-  .prompt-demo {
-    background: rgba(15, 31, 56, 0.7);
-    border: 1px solid rgba(71, 167, 255, 0.2);
-    border-radius: 10px;
-    padding: 1rem 1.5rem;
-    margin: 1.5rem auto;
-    max-width: 550px;
-    text-align: left;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.8rem;
-    position: relative;
-  }
-
-  .prompt-label {
-    font-size: 0.6rem;
-    color: var(--electric-400);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    margin-bottom: 0.5rem;
-  }
-
-  .prompt-text {
-    color: #e2e8f0;
-    line-height: 1.5;
-  }
-
-  .prompt-cursor {
-    display: inline-block;
-    width: 2px;
-    height: 1em;
-    background: var(--electric-400);
-    margin-left: 2px;
-    animation: blink 1s step-end infinite;
-    vertical-align: text-bottom;
-  }
-
-  @keyframes blink {
-    50% { opacity: 0; }
-  }
-
-  .arrow-down {
-    font-size: 1.5rem;
-    color: var(--electric-400);
-    margin: 0.8rem 0;
-    animation: bounceDown 1.5s ease-in-out infinite;
-  }
-
-  @keyframes bounceDown {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(6px); }
-  }
-
-  .result-text {
-    font-size: 0.85rem;
-    color: var(--profit);
-    font-weight: 600;
-  }
-
-  /* ===== FINALE ===== */
-  .finale-container {
-    text-align: center;
-    padding: 0 2rem;
-  }
-
-  .finale-logo {
-    font-size: 4rem;
-    margin-bottom: 1rem;
-    animation: logoGlow 2s ease-in-out infinite;
-  }
-
-  @keyframes logoGlow {
-    0%, 100% { filter: drop-shadow(0 0 10px rgba(71, 167, 255, 0.3)); }
-    50% { filter: drop-shadow(0 0 25px rgba(71, 167, 255, 0.6)); }
-  }
-
-  .finale-title {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: clamp(1.8rem, 5vw, 3rem);
-    font-weight: 700;
-    color: #ffffff;
-    margin-bottom: 0.5rem;
-    text-shadow: 0 0 40px rgba(71, 167, 255, 0.3);
-  }
-
-  .finale-tagline {
-    font-size: clamp(0.9rem, 2vw, 1.1rem);
-    color: var(--electric-300);
-    font-weight: 300;
-    margin-bottom: 2.5rem;
-  }
-
-  .cta-button {
-    display: inline-block;
-    padding: 0.9rem 2.5rem;
-    background: linear-gradient(135deg, var(--electric-500), var(--electric-400));
-    color: white;
-    font-weight: 700;
-    font-size: 1rem;
-    border-radius: 10px;
-    text-decoration: none;
-    border: none;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 20px rgba(71, 167, 255, 0.3);
-    font-family: 'Inter', sans-serif;
-    letter-spacing: 0.03em;
-  }
-  .cta-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 30px rgba(71, 167, 255, 0.5);
-  }
-
-  .finale-meta {
-    margin-top: 2rem;
-    font-size: 0.7rem;
-    color: var(--navy-300);
-    line-height: 1.8;
-  }
-
-  /* ===== PROGRESS BAR ===== */
-  .progress-bar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    height: 3px;
-    background: linear-gradient(90deg, var(--electric-500), var(--electric-400), var(--electric-300));
-    z-index: 100;
-    transition: width 0.3s linear;
-    box-shadow: 0 0 10px rgba(71, 167, 255, 0.5);
-  }
-
-  /* ===== CONTROLS ===== */
-  .controls {
-    position: fixed;
-    bottom: 16px;
-    right: 16px;
-    z-index: 200;
-    display: flex;
-    gap: 8px;
-    opacity: 0.4;
-    transition: opacity 0.3s;
-  }
-  .controls:hover { opacity: 1; }
-
-  .ctrl-btn {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    border: 1px solid rgba(71, 167, 255, 0.3);
-    background: rgba(15, 31, 56, 0.8);
-    color: var(--electric-300);
-    font-size: 1rem;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-    backdrop-filter: blur(10px);
-  }
-  .ctrl-btn:hover {
-    background: rgba(71, 167, 255, 0.2);
-    border-color: var(--electric-400);
-  }
-
-  /* ===== SCREENSHOTS ===== */
-  .screenshot-grid {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-    max-width: 1050px;
-    width: 95%;
-    margin: 0 auto;
-    flex-wrap: wrap;
-  }
-
-  .screenshot-card {
-    opacity: 0;
-    transform: translateY(25px) scale(0.95);
-    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-  .screenshot-card.visible {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-
-  .screenshot-frame {
-    width: 280px;
-    height: 180px;
-    border-radius: 10px;
-    overflow: hidden;
-    border: 1px solid rgba(71, 167, 255, 0.25);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 30px rgba(71, 167, 255, 0.08);
-    position: relative;
-    background: var(--navy-900);
-  }
-  .screenshot-frame.wide {
-    width: 280px;
-  }
-  .screenshot-frame iframe {
-    width: 1200px;
-    height: 800px;
-    transform: scale(0.233);
-    transform-origin: top left;
-    border: none;
-    pointer-events: none;
-  }
-
-  .screenshot-label {
-    font-size: 0.7rem;
-    color: var(--navy-300);
-    text-align: center;
-    margin-top: 0.5rem;
-    font-weight: 500;
-  }
-
-  /* ===== RESPONSIVE ===== */
   @media (max-width: 640px) {
-    .feature-grid {
-      grid-template-columns: repeat(2, 1fr);
-      gap: 0.6rem;
-    }
-    .feature-card { padding: 0.7rem; }
-    .feature-icon { font-size: 1.4rem; margin-bottom: 0.3rem; }
-    .feature-label { font-size: 0.65rem; }
-    .feature-desc { font-size: 0.6rem; }
-    .stats-bar { gap: 1rem; }
-    .vibe-stats { gap: 1rem; }
-    .step-row { gap: 0.8rem; margin-bottom: 1rem; }
-    .step-number { width: 34px; height: 34px; font-size: 0.9rem; }
-    .step-content h3 { font-size: 0.9rem; }
-    .step-content p { font-size: 0.75rem; }
-
-    /* Screenshot grid — 2 columns on mobile */
-    .screenshot-grid {
-      gap: 0.6rem;
-      max-width: 100%;
-      width: 92%;
-    }
-    .screenshot-frame {
-      width: 150px;
-      height: 100px;
-    }
-    .screenshot-frame iframe {
-      width: 1200px;
-      height: 800px;
-      transform: scale(0.125);
-    }
-    .screenshot-label { font-size: 0.55rem; }
-
-    /* Vibe coding section */
-    .vibe-section { padding: 0 1rem; }
-    .vibe-badge { font-size: 0.6rem; padding: 0.3rem 0.8rem; }
-    .vibe-desc { font-size: 0.75rem !important; }
-    .prompt-demo {
-      padding: 0.7rem 1rem;
-      font-size: 0.65rem;
-    }
-    .result-text { font-size: 0.7rem !important; }
-    .vibe-stat-value { font-size: 1.2rem !important; }
-    .vibe-stat-label { font-size: 0.55rem; }
-
-    /* Finale */
-    .finale-logo { font-size: 2.5rem; }
-    .finale-meta { font-size: 0.6rem; }
-    .cta-button { padding: 0.7rem 2rem; font-size: 0.85rem; }
-
-    /* Controls */
-    .controls {
-      bottom: 10px;
-      right: 10px;
-      gap: 5px;
-    }
-    .ctrl-btn { width: 30px; height: 30px; font-size: 0.8rem; }
-
-    /* Headlines */
-    .headline { margin-bottom: 0.8rem; }
-    .headline-source { font-size: 0.6rem; }
-
-    /* Ticker */
-    .ticker-bar { height: 28px; bottom: 44px; }
-    .ticker-content { font-size: 0.6rem; }
-
-    /* Scenes need safe padding to avoid controls overlap */
-    .scene { padding: 0.5rem; }
+    .ticker-bar { bottom: 44px; height: 28px; }
+    .ti { font-size: 10px; padding: 0 14px; }
   }
+  @media (prefers-reduced-motion: reduce) { * { animation-duration: .001s !important; } }
 </style>
 </head>
 <body>
+<div id="stage">
+  <div id="redFlash"></div>
 
-<div class="stage" id="stage">
-  <!-- Background layers -->
-  <div class="bg-grid"></div>
-  <div class="bg-vignette"></div>
-  <div class="red-flash" id="redFlash"></div>
-
-  <!-- ===== SCENE 0: OPENING BLACK ===== -->
+  <!-- Scene 0: cold open -->
   <div class="scene active" id="scene-0">
-    <div style="text-align:center">
-      <div style="font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:var(--electric-400); text-transform:uppercase; letter-spacing:0.2em; opacity:0.7">
-        Australia&rsquo;s National Electricity Market
-      </div>
-    </div>
+    <div class="bolt">&#9889;</div>
   </div>
 
-  <!-- ===== SCENE 1: HEADLINES ===== -->
+  <!-- Scene 1: crisis headlines -->
   <div class="scene" id="scene-1">
-    <div class="headlines-container" id="headlines">
-      <div class="headline" id="hl-0">
-        <div class="headline-text hl-red">&ldquo;Wholesale electricity prices hit $15,500/MWh during heatwave&rdquo;</div>
-        <div class="headline-source">AEMO Market Notice &bull; Summer 2024</div>
-      </div>
-      <div class="headline" id="hl-1">
-        <div class="headline-text hl-amber">&ldquo;Liddell coal plant closes after 52 years &mdash; 2,000 MW gone&rdquo;</div>
-        <div class="headline-source">Energy Market Developments &bull; April 2023</div>
-      </div>
-      <div class="headline" id="hl-2">
-        <div class="headline-text hl-green">&ldquo;Rooftop solar pushes daytime prices below zero&rdquo;</div>
-        <div class="headline-source">AEMO Quarterly Report &bull; Spring 2024</div>
-      </div>
-      <div class="headline" id="hl-3">
-        <div class="headline-text hl-red">&ldquo;Battery revenue up 340% as volatility surges&rdquo;</div>
-        <div class="headline-source">Clean Energy Market Insights &bull; Q3 2025</div>
-      </div>
-      <div class="headline" id="hl-4">
-        <div class="headline-text hl-white">&ldquo;The energy market is changing faster than at any point in its history&rdquo;</div>
-        <div class="headline-source">Energy Security Board &bull; 2025 Review</div>
-      </div>
-    </div>
-
-    <div class="ticker-bar">
-      <div class="ticker-content">
-        <span class="ticker-item"><span class="ticker-dot red"></span> NSW <span class="ticker-price ticker-up">$487.32</span> &uarr;12%</span>
-        <span class="ticker-item"><span class="ticker-dot green"></span> VIC <span class="ticker-price ticker-down">$62.15</span> &darr;8%</span>
-        <span class="ticker-item"><span class="ticker-dot amber"></span> QLD <span class="ticker-price ticker-up">$312.80</span> &uarr;45%</span>
-        <span class="ticker-item"><span class="ticker-dot green"></span> SA <span class="ticker-price ticker-down">-$28.50</span> &darr;</span>
-        <span class="ticker-item"><span class="ticker-dot red"></span> TAS <span class="ticker-price ticker-up">$185.60</span> &uarr;22%</span>
-        <span class="ticker-item"><span class="ticker-dot green"></span> Demand 28,450 MW</span>
-        <span class="ticker-item"><span class="ticker-dot amber"></span> Solar 14,200 MW &bull; 48%</span>
-        <span class="ticker-item"><span class="ticker-dot green"></span> Wind 4,850 MW &bull; 17%</span>
-        <span class="ticker-item"><span class="ticker-dot red"></span> Coal 6,200 MW &bull; 22%</span>
-        <span class="ticker-item"><span class="ticker-dot amber"></span> Gas 2,100 MW &bull; 7%</span>
-        <span class="ticker-item"><span class="ticker-dot green"></span> Hydro 1,100 MW &bull; 4%</span>
-        <!-- duplicate for seamless loop -->
-        <span class="ticker-item"><span class="ticker-dot red"></span> NSW <span class="ticker-price ticker-up">$487.32</span> &uarr;12%</span>
-        <span class="ticker-item"><span class="ticker-dot green"></span> VIC <span class="ticker-price ticker-down">$62.15</span> &darr;8%</span>
-        <span class="ticker-item"><span class="ticker-dot amber"></span> QLD <span class="ticker-price ticker-up">$312.80</span> &uarr;45%</span>
-        <span class="ticker-item"><span class="ticker-dot green"></span> SA <span class="ticker-price ticker-down">-$28.50</span> &darr;</span>
-        <span class="ticker-item"><span class="ticker-dot red"></span> TAS <span class="ticker-price ticker-up">$185.60</span> &uarr;22%</span>
-        <span class="ticker-item"><span class="ticker-dot green"></span> Demand 28,450 MW</span>
-        <span class="ticker-item"><span class="ticker-dot amber"></span> Solar 14,200 MW &bull; 48%</span>
-        <span class="ticker-item"><span class="ticker-dot green"></span> Wind 4,850 MW &bull; 17%</span>
-        <span class="ticker-item"><span class="ticker-dot red"></span> Coal 6,200 MW &bull; 22%</span>
-        <span class="ticker-item"><span class="ticker-dot amber"></span> Gas 2,100 MW &bull; 7%</span>
-        <span class="ticker-item"><span class="ticker-dot green"></span> Hydro 1,100 MW &bull; 4%</span>
-      </div>
-    </div>
+    <div class="headline" id="hl-0"><span class="src">AEMO Market Notice</span>Prices hit <span class="red">$16,600/MWh</span> as the heat bites</div>
+    <div class="headline" id="hl-1"><span class="src">Systems Operator</span>South Australia <span class="amber">islanded</span> — the interconnector trips</div>
+    <div class="headline" id="hl-2"><span class="src">Market Wire</span>A retailer <span class="red">collapses</span> — caught short in the spike</div>
+    <div class="headline" id="hl-3"><span class="src">Regulator</span>The <span class="amber">AER</span> opens an investigation into bidding conduct</div>
+    <div class="headline" id="hl-4"><span class="src">The Grid, 2030</span>Coal exits. Renewables surge. <span class="elec">Volatility is the new normal.</span></div>
+    <div class="headline" id="hl-5">In the NEM, <span class="red">most players lose money.</span></div>
   </div>
 
-  <!-- ===== SCENE 2: THE QUESTION ===== -->
-  <div class="scene" id="scene-2">
-    <div class="big-question">
-      Does your team <span class="em">really understand</span><br>how the market works?
-    </div>
+  <!-- Scene 2: Phase 1 title -->
+  <div class="scene title-reveal" id="scene-2">
+    <div class="phase-label">The Fundamentals</div>
+    <div class="brand"><span class="glow-electric">GRIDRIVAL</span><span class="sub glow-electric">MERIT ORDER</span></div>
+    <div class="tagline-lead" style="margin-top:18px;color:var(--muted)">Learn how the market really clears.</div>
   </div>
 
-  <!-- ===== SCENE 3: GAME REVEAL TITLE ===== -->
+  <!-- Scene 3: merit order diagram -->
   <div class="scene" id="scene-3">
-    <div style="text-align:center">
-      <div style="font-size:3.5rem; margin-bottom:0.5rem">&#9889;</div>
-      <div class="reveal-title">GridRival</div>
-      <div class="reveal-subtitle">Learn by playing the market</div>
-
-      <div class="feature-grid" id="featureGrid">
-        <div class="feature-card" id="fc-0">
-          <div class="feature-icon">&#128101;</div>
-          <div class="feature-label">Up to 15 teams</div>
-          <div class="feature-desc">Play from phones &amp; laptops on the same WiFi</div>
-        </div>
-        <div class="feature-card" id="fc-1">
-          <div class="feature-icon">&#128200;</div>
-          <div class="feature-label">Real merit order</div>
-          <div class="feature-desc">Bid your generators, see the dispatch stack live</div>
-        </div>
-        <div class="feature-card" id="fc-2">
-          <div class="feature-icon">&#127758;</div>
-          <div class="feature-label">NEM scenarios</div>
-          <div class="feature-desc">Heatwaves, negative prices, plant outages &amp; more</div>
-        </div>
-        <div class="feature-card" id="fc-3">
-          <div class="feature-icon">&#128293;</div>
-          <div class="feature-label">7 asset types</div>
-          <div class="feature-desc">Coal, gas, hydro, wind, solar &amp; battery</div>
-        </div>
-        <div class="feature-card" id="fc-4">
-          <div class="feature-icon">&#127919;</div>
-          <div class="feature-label">5 game modes</div>
-          <div class="feature-desc">15 min intro to 3+ hour deep dive</div>
-        </div>
-        <div class="feature-card" id="fc-5">
-          <div class="feature-icon">&#127891;</div>
-          <div class="feature-label">Built for learning</div>
-          <div class="feature-desc">Teaching prompts, walkthroughs &amp; strategy guides</div>
-        </div>
+    <div class="diagram">
+      <h3>How the market clears</h3>
+      <div class="mo-wrap" id="moWrap">
+        <span class="mo-axis-y">$/MWh</span>
+        <span class="mo-axis-x">MW &rarr;</span>
+        <div class="mo-bar" style="--c:#2f9e6b;--h:16%"><span class="lab">Wind $5</span></div>
+        <div class="mo-bar" style="--c:#3aa76d;--h:26%"><span class="lab">Solar $0</span></div>
+        <div class="mo-bar" style="--c:#5aa0c8;--h:40%"><span class="lab">Coal $33</span></div>
+        <div class="mo-bar" style="--c:#7f93c0;--h:54%"><span class="lab">Hydro $60</span></div>
+        <div class="mo-bar" style="--c:#c99a3a;--h:70%"><span class="lab">CCGT $85</span></div>
+        <div class="mo-bar" style="--c:#e0703a;--h:88%"><span class="lab">Peaker $160</span></div>
+        <div class="mo-bar" style="--c:#e04b4b;--h:100%"><span class="lab">VOLL</span></div>
+        <div class="mo-demand"><span class="dl">Demand</span></div>
+        <div class="mo-clear" id="moClear" style="bottom:70%"><span class="price">$85 / MWh</span></div>
       </div>
+      <div class="mo-caption" id="moCap">Stack the cheapest generators first. Where supply meets demand, the <b>marginal bid sets the price</b> — and everyone dispatched earns it.</div>
     </div>
   </div>
 
-  <!-- ===== SCENE 3B: SCREENSHOTS ===== -->
-  <div class="scene" id="scene-3b">
-    <div style="text-align:center; margin-bottom:1.5rem;">
-      <div style="font-size:0.7rem; color:var(--electric-400); text-transform:uppercase; letter-spacing:0.15em; margin-bottom:0.5rem">See It In Action</div>
-      <div style="font-size:clamp(1.2rem,2.5vw,1.6rem); font-weight:700; color:#fff">Real screens from the game</div>
-    </div>
-    <div class="screenshot-grid">
-      <div class="screenshot-card" id="ss-0">
-        <div class="screenshot-frame">
-          <iframe src="/gridrival-showcase/api/gameplay-summary/" loading="lazy" sandbox="allow-scripts allow-same-origin" scrolling="no"></iframe>
-        </div>
-        <div class="screenshot-label">&#128214; Gameplay Summary &mdash; rules, strategy &amp; asset-type bidding</div>
-      </div>
-      <div class="screenshot-card" id="ss-1">
-        <div class="screenshot-frame">
-          <iframe src="/gridrival-showcase/api/educational-compendium/" loading="lazy" sandbox="allow-scripts allow-same-origin" scrolling="no"></iframe>
-        </div>
-        <div class="screenshot-label">&#127891; Educational Compendium &mdash; comprehensive NEM learning</div>
-      </div>
-      <div class="screenshot-card" id="ss-2">
-        <div class="screenshot-frame">
-          <iframe src="/gridrival-showcase/api/transmission-education/" loading="lazy" sandbox="allow-scripts allow-same-origin" scrolling="no"></iframe>
-        </div>
-        <div class="screenshot-label">&#9889; Transmission Education &mdash; how the grid connects</div>
-      </div>
-      <div class="screenshot-card" id="ss-3">
-        <div class="screenshot-frame">
-          <iframe src="/gridrival-showcase/api/learn-nem/" loading="lazy" sandbox="allow-scripts allow-same-origin" scrolling="no"></iframe>
-        </div>
-        <div class="screenshot-label">&#128161; Learn the NEM &mdash; interactive educational slides</div>
-      </div>
-      <div class="screenshot-card" id="ss-4">
-        <div class="screenshot-frame">
-          <iframe src="/gridrival-showcase/api/pre-read/" loading="lazy" sandbox="allow-scripts allow-same-origin" scrolling="no"></iframe>
-        </div>
-        <div class="screenshot-label">&#128218; Pre-read Guide &mdash; essential background material</div>
-      </div>
-      <div class="screenshot-card" id="ss-5">
-        <div class="screenshot-frame">
-          <iframe src="/gridrival-showcase/api/enhancement-concepts/" loading="lazy" sandbox="allow-scripts allow-same-origin" scrolling="no"></iframe>
-        </div>
-        <div class="screenshot-label">&#128640; Enhancement Concepts &mdash; future game features</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== SCENE 4: HOW IT WORKS ===== -->
+  <!-- Scene 4: phase-1 features -->
   <div class="scene" id="scene-4">
-    <div style="text-align:center; margin-bottom: 2rem;">
-      <div style="font-size:0.7rem; color:var(--electric-400); text-transform:uppercase; letter-spacing:0.15em; margin-bottom:0.5rem;">How It Works</div>
-      <div style="font-size:clamp(1.3rem,3vw,1.8rem); font-weight:700; color:#fff">Play a round in 5 minutes</div>
-    </div>
-
-    <div class="steps-container">
-      <div class="step-row" id="step-0">
-        <div class="step-number">1</div>
-        <div class="step-content">
-          <h3>&#128214; Briefing</h3>
-          <p>Host sets the scene &mdash; season, demand, scenarios. Teams see their portfolio of generators.</p>
-        </div>
-      </div>
-      <div class="step-row from-right" id="step-1">
-        <div class="step-number">2</div>
-        <div class="step-content">
-          <h3>&#128176; Bid</h3>
-          <p>Teams submit price &amp; quantity bids for each asset across 4 time periods. Strategy matters.</p>
-        </div>
-      </div>
-      <div class="step-row" id="step-2">
-        <div class="step-number">3</div>
-        <div class="step-content">
-          <h3>&#9889; Dispatch</h3>
-          <p>The engine stacks all bids in price order. Cheapest generators run first. The clearing price is set.</p>
-        </div>
-      </div>
-      <div class="step-row from-right" id="step-3">
-        <div class="step-number">4</div>
-        <div class="step-content">
-          <h3>&#128181; Results</h3>
-          <p>Profit = (Clearing Price &minus; Cost) &times; MW &times; Hours. Leaderboard updates. Discussion time.</p>
-        </div>
-      </div>
+    <div class="sect-title">One market. <span class="accent">Every dynamic.</span></div>
+    <div class="card-grid">
+      <div class="fcard" id="fc-0"><div class="ic">&#128101;</div><div class="t">Multiplayer</div><div class="d">Up to 15 teams bidding live from their phones</div></div>
+      <div class="fcard" id="fc-1"><div class="ic">&#128506;&#65039;</div><div class="t">Five Regions</div><div class="d">QLD, NSW, VIC, SA, TAS — joined by interconnectors</div></div>
+      <div class="fcard danger" id="fc-2"><div class="ic">&#128293;</div><div class="t">VOLL</div><div class="d">When supply runs out, the price rockets to $16,600</div></div>
+      <div class="fcard warn" id="fc-3"><div class="ic">&#9878;&#65039;</div><div class="t">AER Watch</div><div class="d">Game the shortage and the regulator comes knocking</div></div>
+      <div class="fcard" id="fc-4"><div class="ic">&#128267;</div><div class="t">Demand Response</div><div class="d">Batteries, hydro and load that fights back</div></div>
     </div>
   </div>
 
-  <!-- ===== SCENE 5: VIBE CODING ===== -->
+  <!-- Scene 5: the turn -->
   <div class="scene" id="scene-5">
-    <div class="vibe-section">
-      <div class="vibe-badge">&#128640; How It Was Built</div>
-      <div class="vibe-title">Built by conversation,<br>not by committee</div>
-      <div class="vibe-desc">
-        250+ plain-English prompts across 17 sessions. One AI (Claude Opus 4.6). Zero developers.<br>
-        No Jira tickets, no sprints &mdash; just a domain expert and an AI that writes code.
-      </div>
+    <div class="turn-1">So you can make money on the merit order.</div>
+    <div class="turn-2">That's just the warm-up.</div>
+  </div>
 
-      <div class="prompt-demo">
-        <div class="prompt-label">Human prompt</div>
-        <div class="prompt-text" id="typingPrompt"></div>
-      </div>
+  <!-- Scene 6: expansion title -->
+  <div class="scene title-reveal" id="scene-6">
+    <div class="phase-label" style="color:var(--gold)">The Expansion</div>
+    <div class="brand"><span class="glow-gold">GRIDRIVAL</span><span class="sub glow-gold">FULL POSITION</span></div>
+    <div class="tagline-lead" style="margin-top:18px;color:var(--muted)">Stop bidding plant. Start running a book.</div>
+  </div>
 
-      <div class="arrow-down">&#8595;</div>
-
-      <div class="result-text" id="resultText" style="opacity:0; transition: opacity 0.5s">
-        &#10003; 35,000+ lines &bull; 120+ files &bull; Real-time multiplayer &bull; Procedural audio &bull; Pro-rata dispatch engine
-      </div>
-
-      <div class="vibe-stats" style="margin-top: 1.5rem;">
-        <div class="vibe-stat" id="vs-0">
-          <div class="vibe-stat-value purple">~8 hrs</div>
-          <div class="vibe-stat-label">Human effort</div>
-        </div>
-        <div class="vibe-stat" id="vs-1">
-          <div class="vibe-stat-value blue">10 phases</div>
-          <div class="vibe-stat-label">From Big Bang to Battery Arbitrage</div>
-        </div>
-        <div class="vibe-stat" id="vs-2">
-          <div class="vibe-stat-value green">~$200</div>
-          <div class="vibe-stat-label">Total AI cost</div>
-        </div>
-      </div>
-
-      <div style="margin-top:1.5rem; display:flex; flex-wrap:wrap; gap:0.5rem; justify-content:center; max-width:600px; margin-left:auto; margin-right:auto;">
-        <span style="font-size:0.65rem; padding:0.25rem 0.6rem; background:rgba(128,90,213,0.15); color:#d6bcfa; border-radius:20px; border:1px solid rgba(128,90,213,0.3);">Session 1: 15,000 lines in one conversation</span>
-        <span style="font-size:0.65rem; padding:0.25rem 0.6rem; background:rgba(49,130,206,0.15); color:#90cdf4; border-radius:20px; border:1px solid rgba(49,130,206,0.3);">Transition bug reported 8 times before AI could see it</span>
-        <span style="font-size:0.65rem; padding:0.25rem 0.6rem; background:rgba(56,161,105,0.15); color:#9ae6b4; border-radius:20px; border:1px solid rgba(56,161,105,0.3);">Sound effects synthesised from maths &mdash; no audio files</span>
-        <span style="font-size:0.65rem; padding:0.25rem 0.6rem; background:rgba(214,158,46,0.15); color:#fefcbf; border-radius:20px; border:1px solid rgba(214,158,46,0.3);">Bundle optimised from 1180KB &rarr; 432KB (63% smaller)</span>
-      </div>
+  <!-- Scene 7: expansion phases -->
+  <div class="scene" id="scene-7">
+    <div class="sect-title">You're not a generator. <span class="accent">You're a gentailer.</span></div>
+    <div class="card-grid">
+      <div class="fcard" id="ph-0"><div class="ic">&#9878;&#65039;</div><div class="t">Positions</div><div class="d">Generation AND customers. Long or short — the market picks a winner</div></div>
+      <div class="fcard warn" id="ph-1"><div class="ic">&#128225;</div><div class="t">Basis Risk</div><div class="d">Your plant clears in VIC, your load pays in SA. Mind the gap</div></div>
+      <div class="fcard gold" id="ph-2"><div class="ic">&#129309;</div><div class="t">Caps &amp; Swaps</div><div class="d">Walk the room, strike a $300 cap on your phone — like a BDM chasing contracts</div></div>
+      <div class="fcard" id="ph-3"><div class="ic">&#127959;&#65039;</div><div class="t">The Long Game</div><div class="d">Reinvest profits — build plant, win C&amp;I customers, out to 2030</div></div>
+      <div class="fcard danger" id="ph-4"><div class="ic">&#10052;&#65039;</div><div class="t">The Winter</div><div class="d">Cold snap. Plants fail. Defend your position — or blow up</div></div>
     </div>
   </div>
 
-  <!-- ===== SCENE 6: FINALE ===== -->
-  <div class="scene" id="scene-6">
-    <div class="finale-container">
-      <div class="finale-logo">&#9889;</div>
-      <div class="finale-title">GridRival</div>
-      <div class="finale-tagline">Understand the market by playing it</div>
-      <button class="cta-button" onclick="window.location.href='/gridrival-showcase/'">Back to Showcase &rarr;</button>
-      <div class="finale-meta">
-        Up to 15 teams &bull; 5 game modes &bull; 7 asset types &bull; Real NEM scenarios<br>
-        Sound effects &bull; Dark mode &bull; Works on phones &bull; No installation required<br><br>
-        <span style="color:var(--electric-400)">Built with Claude Code + human domain expertise</span>
-      </div>
+  <!-- Scene 8: summary montage -->
+  <div class="scene" id="scene-8">
+    <div class="verbs">
+      <span class="verb v0" id="vb-0">BID.</span>
+      <span class="verb v1" id="vb-1">POSITION.</span>
+      <span class="verb v2" id="vb-2">HEDGE.</span>
+      <span class="verb v3" id="vb-3">SURVIVE.</span>
+    </div>
+    <div class="chips">
+      <span class="chip" id="ch-0">Merit-order dispatch</span>
+      <span class="chip" id="ch-1">Regional prices &amp; basis</span>
+      <span class="chip" id="ch-2">VOLL &amp; scarcity</span>
+      <span class="chip" id="ch-3">AER conduct fines</span>
+      <span class="chip" id="ch-4">Caps &amp; swaps</span>
+      <span class="chip" id="ch-5">Retail margin</span>
+      <span class="chip" id="ch-6">C&amp;I customers</span>
+      <span class="chip" id="ch-7">Demand response</span>
+      <span class="chip" id="ch-8">Live multiplayer</span>
     </div>
   </div>
-</div>
 
-<!-- Click-to-start overlay — required for browser autoplay policy -->
-<div id="startOverlay" style="
-  position:fixed; inset:0; z-index:9999;
-  background: radial-gradient(ellipse at center, rgba(8,16,28,0.92) 0%, rgba(8,16,28,0.98) 100%);
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
-  cursor:pointer; user-select:none;
-">
-  <div style="font-size:clamp(1.8rem,4vw,3rem); font-weight:800; color:#fff; margin-bottom:0.5rem; letter-spacing:-0.02em;">&#9889; GridRival</div>
-  <div style="font-size:clamp(0.9rem,2vw,1.2rem); color:var(--navy-300); margin-bottom:2.5rem;">A cinematic trailer</div>
-  <div style="
-    width:80px; height:80px; border-radius:50%;
-    background: rgba(71,167,255,0.15); border:2px solid var(--electric-400);
-    display:flex; align-items:center; justify-content:center;
-    animation: pulsePlay 2s ease-in-out infinite;
-    margin-bottom:1.5rem;
-  ">
-    <span style="font-size:2rem; margin-left:4px;">&#9654;</span>
+  <!-- Scene 9: finale -->
+  <div class="scene" id="scene-9">
+    <div class="finale-tag" id="ft-0"><span class="dim">In the NEM, most players lose money.</span></div>
+    <div class="finale-tag" id="ft-1" style="font-size:clamp(24px,4.6vw,52px);font-weight:900;margin-top:6px">You won't.</div>
+    <div class="finale-brand glow-electric" id="ft-2" style="margin-top:22px">GRIDRIVAL</div>
+    <div class="finale-sub" id="ft-3" style="margin-top:10px">Bid &middot; Position &middot; Hedge &middot; Survive</div>
   </div>
-  <div style="font-size:0.85rem; color:var(--navy-300); opacity:0.7;">Click anywhere to play &#8226; Best with sound on &#127911;</div>
-</div>
 
-<!-- Progress bar -->
-<div class="progress-bar" id="progressBar" style="width:0%"></div>
+  <!-- ticker -->
+  <div class="ticker-bar">
+    <div class="ticker-content" id="tickerContent"></div>
+  </div>
 
-<!-- Controls -->
-<div class="controls">
-  <button class="ctrl-btn" id="btnMute" title="Mute / Unmute music">&#128266;</button>
-  <button class="ctrl-btn" id="btnRestart" title="Restart">&#8634;</button>
-  <button class="ctrl-btn" id="btnPause" title="Pause / Play">&#10074;&#10074;</button>
-  <button class="ctrl-btn" id="btnSkip" title="Skip to end">&#9654;&#9654;</button>
-  <button class="ctrl-btn" id="btnFullscreen" title="Fullscreen">&#x26F6;</button>
+  <!-- controls -->
+  <div class="controls">
+    <button id="btnPause" title="Pause (space)">&#10074;&#10074;</button>
+    <button id="btnRestart" title="Restart (R)">&#8635;</button>
+    <button id="btnMute" title="Mute (M)">&#128266;</button>
+    <div class="progress-track"><div id="progressBar"></div></div>
+    <span class="hint">space &middot; &larr; &rarr; &middot; F</span>
+    <button id="btnSkip" title="Skip to end">&#9197;</button>
+    <button id="btnFullscreen" title="Fullscreen (F)">&#9974;</button>
+  </div>
+
+  <!-- start overlay -->
+  <div id="startOverlay">
+    <div class="bolt">&#9889;</div>
+    <div class="st-brand glow-electric">GRIDRIVAL</div>
+    <div class="st-play">&#9654; Play Trailer</div>
+    <div class="st-note">with sound &middot; ~62 seconds</div>
+  </div>
 </div>
 
 <script>
 (function() {
-  // ===== PROCEDURAL MUSIC ENGINE =====
-  // Synthesises a full soundtrack using Web Audio API — no audio files needed.
-  // Four moods: foreboding (Act 1), trading (Act 2 game reveal), quirky/digital (Act 3 vibe coding), triumphant (Finale)
+  // ===== ticker content (duplicated for seamless scroll) =====
+  const tickItems = [
+    ['r','NSW','$487.32','up','&uarr;'],['g','VIC','$62.15','down','&darr;'],['a','QLD','$312.80','up','&uarr;'],
+    ['g','SA','-$28.50','down','&darr;'],['r','TAS','$185.60','up','&uarr;'],['b','Demand','28,450 MW','',''],
+    ['a','Solar','14.2 GW &bull; 48%','',''],['g','Wind','4.85 GW','',''],['r','Coal','6.2 GW','',''],
+    ['a','Basis SA-VIC','+$122','up','&uarr;'],['b','Cap $300','struck','',''],['r','VOLL','$16,600','up','&uarr;'],
+  ];
+  function tickerHTML() {
+    return tickItems.map(([d,n,p,dir,arw]) =>
+      '<span class="ti"><span class="dot ' + d + '"></span>' + n +
+      (p ? ' <span class="num ' + (dir||'') + '">' + p + '</span>' : '') + (arw ? ' ' + arw : '') + '</span>'
+    ).join('');
+  }
+  document.getElementById('tickerContent').innerHTML = tickerHTML() + tickerHTML();
 
-  let audioCtx = null;
-  let musicMuted = false;
-  let masterGain = null;
-  let currentMood = null;
-  let activeNodes = []; // track all scheduled nodes for cleanup
-  let musicIntervals = [];
-  let started = false; // true after user clicks start overlay
+  // ===== PROCEDURAL MUSIC ENGINE (Web Audio, no files) =====
+  let audioCtx = null, musicMuted = false, masterGain = null, currentMood = null;
+  let activeNodes = [], musicIntervals = [], started = false;
 
   function initAudio() {
     if (audioCtx && audioCtx.state === 'running') return;
@@ -1061,621 +353,286 @@ export function getCinematicTrailerHTML(): string {
       if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         masterGain = audioCtx.createGain();
-        masterGain.gain.value = 0.35;
+        masterGain.gain.value = 0.38;
         masterGain.connect(audioCtx.destination);
       }
-      // Resume if suspended (browser autoplay policy)
-      if (audioCtx.state === 'suspended') {
-        audioCtx.resume();
-      }
-    } catch(e) { /* no audio support */ }
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+    } catch(e) {}
   }
-
   function stopAllMusic() {
-    musicIntervals.forEach(id => clearInterval(id));
-    musicIntervals = [];
-    activeNodes.forEach(n => { try { n.stop(); } catch(e) {} });
-    activeNodes = [];
+    musicIntervals.forEach(id => clearInterval(id)); musicIntervals = [];
+    activeNodes.forEach(n => { try { n.stop(); } catch(e) {} }); activeNodes = [];
     currentMood = null;
   }
-
   function playNote(freq, duration, type, volume, startDelay) {
     if (!audioCtx || !masterGain || musicMuted) return;
     const start = audioCtx.currentTime + (startDelay || 0);
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.type = type || 'sine';
-    osc.frequency.value = freq;
+    const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
+    osc.type = type || 'sine'; osc.frequency.value = freq;
     gain.gain.setValueAtTime(volume || 0.15, start);
     gain.gain.exponentialRampToValueAtTime(0.001, start + duration);
-    osc.connect(gain);
-    gain.connect(masterGain);
-    osc.start(start);
-    osc.stop(start + duration + 0.05);
-    activeNodes.push(osc);
-    return osc;
+    osc.connect(gain); gain.connect(masterGain);
+    osc.start(start); osc.stop(start + duration + 0.05);
+    activeNodes.push(osc); return osc;
   }
-
-  // Sustained drone pad — multiple detuned oscillators
   function playDrone(freq, duration, type, volume) {
     if (!audioCtx || !masterGain || musicMuted) return;
-    const detunes = [-7, 0, 7, 12];
-    detunes.forEach(d => {
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = type || 'sine';
-      osc.frequency.value = freq;
-      osc.detune.value = d;
+    [-7,0,7,12].forEach(d => {
+      const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
+      osc.type = type || 'sine'; osc.frequency.value = freq; osc.detune.value = d;
       gain.gain.setValueAtTime(0, audioCtx.currentTime);
       gain.gain.linearRampToValueAtTime(volume || 0.04, audioCtx.currentTime + 0.8);
       gain.gain.linearRampToValueAtTime(volume || 0.04, audioCtx.currentTime + duration - 1);
       gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + duration);
-      osc.connect(gain);
-      gain.connect(masterGain);
-      osc.start(audioCtx.currentTime);
-      osc.stop(audioCtx.currentTime + duration + 0.1);
+      osc.connect(gain); gain.connect(masterGain);
+      osc.start(audioCtx.currentTime); osc.stop(audioCtx.currentTime + duration + 0.1);
       activeNodes.push(osc);
     });
   }
-
-  // Low rumble using filtered noise
   function playRumble(duration, volume) {
     if (!audioCtx || !masterGain || musicMuted) return;
     const bufferSize = audioCtx.sampleRate * duration;
     const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-    const data = buffer.getChannelData(0);
-    // Brown noise (integrated white noise for low rumble)
-    let last = 0;
-    for (let i = 0; i < bufferSize; i++) {
-      const white = Math.random() * 2 - 1;
-      last = (last + 0.02 * white) / 1.02;
-      data[i] = last * 3.5;
-    }
-    const source = audioCtx.createBufferSource();
-    source.buffer = buffer;
-    const filter = audioCtx.createBiquadFilter();
-    filter.type = 'lowpass';
-    filter.frequency.value = 120;
+    const data = buffer.getChannelData(0); let last = 0;
+    for (let i = 0; i < bufferSize; i++) { const w = Math.random()*2-1; last = (last + 0.02*w)/1.02; data[i] = last*3.5; }
+    const src = audioCtx.createBufferSource(); src.buffer = buffer;
+    const filt = audioCtx.createBiquadFilter(); filt.type='lowpass'; filt.frequency.value=120;
     const gain = audioCtx.createGain();
     gain.gain.setValueAtTime(0, audioCtx.currentTime);
-    gain.gain.linearRampToValueAtTime(volume || 0.12, audioCtx.currentTime + 1);
-    gain.gain.linearRampToValueAtTime(volume || 0.12, audioCtx.currentTime + duration - 1.5);
-    gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + duration);
-    source.connect(filter);
-    filter.connect(gain);
-    gain.connect(masterGain);
-    source.start();
-    source.stop(audioCtx.currentTime + duration + 0.1);
-    activeNodes.push(source);
+    gain.gain.linearRampToValueAtTime(volume||0.12, audioCtx.currentTime+1);
+    gain.gain.linearRampToValueAtTime(volume||0.12, audioCtx.currentTime+duration-1.5);
+    gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime+duration);
+    src.connect(filt); filt.connect(gain); gain.connect(masterGain);
+    src.start(); src.stop(audioCtx.currentTime+duration+0.1); activeNodes.push(src);
   }
-
-  // Impact hit — for headline punctuation
   function playImpact() {
     if (!audioCtx || !masterGain || musicMuted) return;
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.type = 'sawtooth';
+    const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
+    osc.type='sawtooth';
     osc.frequency.setValueAtTime(80, audioCtx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(30, audioCtx.currentTime + 0.4);
-    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
-    osc.connect(gain);
-    gain.connect(masterGain);
-    osc.start(audioCtx.currentTime);
-    osc.stop(audioCtx.currentTime + 0.6);
-    activeNodes.push(osc);
+    osc.frequency.exponentialRampToValueAtTime(30, audioCtx.currentTime+0.4);
+    gain.gain.setValueAtTime(0.22, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+0.5);
+    osc.connect(gain); gain.connect(masterGain);
+    osc.start(); osc.stop(audioCtx.currentTime+0.6); activeNodes.push(osc);
   }
-
-  // ---- MOOD: FOREBODING (Act 1) ----
-  // Low drone, minor key, slow heartbeat pulse, occasional dissonant stabs
-  function startForeboding() {
-    if (currentMood === 'foreboding') return;
-    stopAllMusic();
-    currentMood = 'foreboding';
-
-    // Low rumble bed
-    playRumble(18, 0.1);
-
-    // Dark drone in D minor
-    playDrone(73.42, 16, 'sawtooth', 0.025);  // D2
-    playDrone(110, 16, 'sine', 0.03);          // A2 (fifth, slightly tense)
-
-    // Slow heartbeat — low thud every 1.5s
-    let beatCount = 0;
-    const heartbeat = setInterval(() => {
-      if (musicMuted || currentMood !== 'foreboding') { clearInterval(heartbeat); return; }
-      playNote(40, 0.15, 'sine', 0.12);
-      setTimeout(() => playNote(38, 0.12, 'sine', 0.08), 200);
-      beatCount++;
-    }, 1500);
-    musicIntervals.push(heartbeat);
-
-    // Occasional high dissonant string stabs
-    const stabs = setInterval(() => {
-      if (musicMuted || currentMood !== 'foreboding') { clearInterval(stabs); return; }
-      if (Math.random() > 0.5) {
-        const freq = [311, 370, 466, 554][Math.floor(Math.random() * 4)]; // Eb, F#, Bb — minor/diminished
-        playNote(freq, 1.5, 'sawtooth', 0.02);
-      }
-    }, 2500);
-    musicIntervals.push(stabs);
-  }
-
-  // ---- MOOD: TRADING FLOOR (Act 2) ----
-  // Pulsing rhythmic feel, major key arpeggios, ticker-tape urgency
-  function startTrading() {
-    if (currentMood === 'trading') return;
-    stopAllMusic();
-    currentMood = 'trading';
-
-    // Bright pad — C major
-    playDrone(130.81, 25, 'triangle', 0.025);  // C3
-    playDrone(164.81, 25, 'sine', 0.02);       // E3
-    playDrone(196, 25, 'sine', 0.02);          // G3
-
-    // Rhythmic pulse — eighth-note pattern
-    let pulseStep = 0;
-    const pulse = setInterval(() => {
-      if (musicMuted || currentMood !== 'trading') { clearInterval(pulse); return; }
-      // Kick on beats 1 and 3
-      if (pulseStep % 4 === 0) {
-        playNote(55, 0.08, 'sine', 0.12);
-      }
-      // Hi-hat-like tick on every beat
-      playNote(8000 + Math.random() * 2000, 0.03, 'square', 0.015);
-
-      // Melodic arpeggio fragments
-      if (pulseStep % 8 === 0) {
-        const arps = [261, 329, 392, 523, 659]; // C E G C5 E5
-        arps.forEach((f, i) => {
-          playNote(f, 0.2, 'triangle', 0.04, i * 0.12);
-        });
-      }
-      if (pulseStep % 8 === 4) {
-        const arps = [220, 277, 329, 440]; // A C# E A4
-        arps.forEach((f, i) => {
-          playNote(f, 0.2, 'triangle', 0.03, i * 0.12);
-        });
-      }
-
-      pulseStep++;
-    }, 200); // ~150 bpm 16th notes
-    musicIntervals.push(pulse);
-
-    // Occasional "data blip" sounds — like a trading terminal
-    const blips = setInterval(() => {
-      if (musicMuted || currentMood !== 'trading') { clearInterval(blips); return; }
-      if (Math.random() > 0.4) {
-        const f = 800 + Math.random() * 1200;
-        playNote(f, 0.05, 'sine', 0.04);
-        setTimeout(() => playNote(f * 1.2, 0.05, 'sine', 0.03), 80);
-      }
-    }, 800);
-    musicIntervals.push(blips);
-  }
-
-  // ---- MOOD: DIGITAL / QUIRKY (Act 3 — Vibe Coding) ----
-  // Chiptune-inspired, playful bleeps, typing sounds, retro-computing feel
-  function startDigital() {
-    if (currentMood === 'digital') return;
-    stopAllMusic();
-    currentMood = 'digital';
-
-    // Soft pad — G major pentatonic feel
-    playDrone(196, 15, 'sine', 0.02);     // G3
-    playDrone(246.94, 15, 'sine', 0.015); // B3
-
-    // 8-bit style melodic loop
-    const melody = [
-      392, 440, 523, 587, 523, 440, 392, 330,  // G A C D C A G E
-      349, 392, 440, 523, 587, 659, 784, 659,  // F G A C D E G5 E
-    ];
-    let melodyIdx = 0;
-    const melodyLoop = setInterval(() => {
-      if (musicMuted || currentMood !== 'digital') { clearInterval(melodyLoop); return; }
-      playNote(melody[melodyIdx % melody.length], 0.15, 'square', 0.035);
-      melodyIdx++;
-    }, 280);
-    musicIntervals.push(melodyLoop);
-
-    // Bass line — simple octave bounce
-    let bassStep = 0;
-    const bass = setInterval(() => {
-      if (musicMuted || currentMood !== 'digital') { clearInterval(bass); return; }
-      const bassNotes = [98, 98, 110, 110, 130.81, 130.81, 110, 110]; // G2 A2 C3
-      playNote(bassNotes[bassStep % bassNotes.length], 0.2, 'triangle', 0.06);
-      bassStep++;
-    }, 560);
-    musicIntervals.push(bass);
-
-    // Keyboard typing sounds — random tiny clicks
-    const typing = setInterval(() => {
-      if (musicMuted || currentMood !== 'digital') { clearInterval(typing); return; }
-      if (Math.random() > 0.3) {
-        playNote(3000 + Math.random() * 4000, 0.01, 'square', 0.02);
-      }
-    }, 90);
-    musicIntervals.push(typing);
-
-    // Modem / data transfer chirps
-    const chirps = setInterval(() => {
-      if (musicMuted || currentMood !== 'digital') { clearInterval(chirps); return; }
-      if (Math.random() > 0.6) {
-        const f = 1200 + Math.random() * 800;
-        playNote(f, 0.08, 'sawtooth', 0.015);
-        setTimeout(() => playNote(f * 0.8, 0.06, 'sawtooth', 0.01), 100);
-      }
-    }, 1200);
-    musicIntervals.push(chirps);
-  }
-
-  // ---- MOOD: TRIUMPHANT (Finale) ----
-  // Major key fanfare, warm chords, uplifting resolution
-  function startTriumphant() {
-    if (currentMood === 'triumphant') return;
-    stopAllMusic();
-    currentMood = 'triumphant';
-
-    // Rich major chord pad — C major
-    playDrone(130.81, 12, 'sine', 0.03);    // C3
-    playDrone(164.81, 12, 'triangle', 0.025); // E3
-    playDrone(196, 12, 'sine', 0.025);       // G3
-    playDrone(261.63, 12, 'sine', 0.02);     // C4
-
-    // Fanfare melody
-    const fanfare = [
-      { f: 523, d: 0.3, t: 0 },      // C5
-      { f: 659, d: 0.3, t: 0.35 },    // E5
-      { f: 784, d: 0.3, t: 0.7 },     // G5
-      { f: 1047, d: 0.8, t: 1.1 },    // C6 — held
-      { f: 880, d: 0.3, t: 2.2 },     // A5
-      { f: 1047, d: 0.6, t: 2.6 },    // C6
-      { f: 1175, d: 1.0, t: 3.3 },    // D6 — resolve up
-    ];
-    fanfare.forEach(n => {
-      playNote(n.f, n.d, 'triangle', 0.06, n.t);
-    });
-
-    // Warm sustained strings after fanfare
-    setTimeout(() => {
-      if (currentMood !== 'triumphant') return;
-      playDrone(261.63, 8, 'sine', 0.025);   // C4
-      playDrone(329.63, 8, 'triangle', 0.02); // E4
-      playDrone(392, 8, 'sine', 0.02);        // G4
-    }, 4000);
-
-    // Gentle rhythmic pulse
-    let finaleStep = 0;
-    const finalePulse = setInterval(() => {
-      if (musicMuted || currentMood !== 'triumphant') { clearInterval(finalePulse); return; }
-      if (finaleStep % 2 === 0) {
-        playNote(65.41, 0.15, 'sine', 0.08); // C2 soft kick
-      }
-      finaleStep++;
-    }, 500);
-    musicIntervals.push(finalePulse);
-  }
-
-  // Transition whoosh — used between acts
   function playWhoosh() {
     if (!audioCtx || !masterGain || musicMuted) return;
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.type = 'sawtooth';
+    const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
+    osc.type='sawtooth';
     osc.frequency.setValueAtTime(200, audioCtx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(2000, audioCtx.currentTime + 0.3);
-    osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.6);
-    gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.7);
-    osc.connect(gain);
-    gain.connect(masterGain);
-    osc.start(audioCtx.currentTime);
-    osc.stop(audioCtx.currentTime + 0.8);
-    activeNodes.push(osc);
+    osc.frequency.exponentialRampToValueAtTime(2000, audioCtx.currentTime+0.3);
+    osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime+0.6);
+    gain.gain.setValueAtTime(0.07, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+0.7);
+    osc.connect(gain); gain.connect(masterGain);
+    osc.start(); osc.stop(audioCtx.currentTime+0.8); activeNodes.push(osc);
+  }
+  function playRiser(dur) {
+    if (!audioCtx || !masterGain || musicMuted) return;
+    const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
+    osc.type='sawtooth';
+    osc.frequency.setValueAtTime(110, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime+dur);
+    gain.gain.setValueAtTime(0.02, audioCtx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.09, audioCtx.currentTime+dur);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+dur+0.2);
+    osc.connect(gain); gain.connect(masterGain);
+    osc.start(); osc.stop(audioCtx.currentTime+dur+0.3); activeNodes.push(osc);
+  }
+
+  function startForeboding() {
+    if (currentMood === 'foreboding') return; stopAllMusic(); currentMood='foreboding';
+    playRumble(20, 0.1);
+    playDrone(73.42, 18, 'sawtooth', 0.025); playDrone(110, 18, 'sine', 0.03);
+    const hb = setInterval(() => { if (musicMuted||currentMood!=='foreboding'){clearInterval(hb);return;}
+      playNote(40,0.15,'sine',0.12); setTimeout(()=>playNote(38,0.12,'sine',0.08),200); }, 1400);
+    musicIntervals.push(hb);
+    const stabs = setInterval(() => { if (musicMuted||currentMood!=='foreboding'){clearInterval(stabs);return;}
+      if (Math.random()>0.45){ const f=[311,370,466,554][Math.floor(Math.random()*4)]; playNote(f,1.5,'sawtooth',0.02);} }, 2300);
+    musicIntervals.push(stabs);
+  }
+  function startTrading() {
+    if (currentMood === 'trading') return; stopAllMusic(); currentMood='trading';
+    playDrone(130.81,26,'triangle',0.025); playDrone(164.81,26,'sine',0.02); playDrone(196,26,'sine',0.02);
+    let step = 0;
+    const pulse = setInterval(() => { if (musicMuted||currentMood!=='trading'){clearInterval(pulse);return;}
+      if (step%4===0) playNote(55,0.08,'sine',0.12);
+      playNote(8000+Math.random()*2000,0.03,'square',0.015);
+      if (step%8===0){ [261,329,392,523,659].forEach((f,i)=>playNote(f,0.2,'triangle',0.04,i*0.12)); }
+      if (step%8===4){ [220,277,329,440].forEach((f,i)=>playNote(f,0.2,'triangle',0.03,i*0.12)); }
+      step++; }, 200);
+    musicIntervals.push(pulse);
+    const blips = setInterval(() => { if (musicMuted||currentMood!=='trading'){clearInterval(blips);return;}
+      if (Math.random()>0.4){ const f=800+Math.random()*1200; playNote(f,0.05,'sine',0.04); setTimeout(()=>playNote(f*1.2,0.05,'sine',0.03),80);} }, 800);
+    musicIntervals.push(blips);
+  }
+  // The Expansion — a bigger, driving, cinematic mood (minor->hopeful, propulsive)
+  function startEpic() {
+    if (currentMood === 'epic') return; stopAllMusic(); currentMood='epic';
+    playDrone(98,24,'sawtooth',0.02); playDrone(146.83,24,'triangle',0.02); playDrone(196,24,'sine',0.02);
+    // four-on-the-floor drive
+    let step = 0;
+    const drive = setInterval(() => { if (musicMuted||currentMood!=='epic'){clearInterval(drive);return;}
+      playNote(49,0.12,'sine',0.14);                        // kick
+      if (step%2===1) playNote(9000,0.02,'square',0.02);    // hat offbeat
+      step++; }, 300);
+    musicIntervals.push(drive);
+    // rising anthem arps in D minor -> F major
+    const anthem = [146.83,220,293.66,349.23,440,349.23,293.66,220];
+    let ai = 0;
+    const arp = setInterval(() => { if (musicMuted||currentMood!=='epic'){clearInterval(arp);return;}
+      playNote(anthem[ai%anthem.length],0.24,'triangle',0.05);
+      if (ai%8===0) playNote(anthem[ai%anthem.length]*2,0.4,'square',0.02);
+      ai++; }, 300);
+    musicIntervals.push(arp);
+  }
+  function startTriumphant() {
+    if (currentMood === 'triumphant') return; stopAllMusic(); currentMood='triumphant';
+    playDrone(130.81,14,'sine',0.03); playDrone(164.81,14,'triangle',0.025); playDrone(196,14,'sine',0.025); playDrone(261.63,14,'sine',0.02);
+    [ {f:523,d:0.3,t:0},{f:659,d:0.3,t:0.35},{f:784,d:0.3,t:0.7},{f:1047,d:0.85,t:1.1},
+      {f:880,d:0.3,t:2.2},{f:1047,d:0.6,t:2.6},{f:1175,d:1.1,t:3.3} ].forEach(n=>playNote(n.f,n.d,'triangle',0.06,n.t));
+    setTimeout(()=>{ if(currentMood!=='triumphant')return; playDrone(261.63,8,'sine',0.025); playDrone(329.63,8,'triangle',0.02); playDrone(392,8,'sine',0.02); },4000);
+    let fs=0; const fp=setInterval(()=>{ if(musicMuted||currentMood!=='triumphant'){clearInterval(fp);return;} if(fs%2===0) playNote(65.41,0.15,'sine',0.08); fs++; },500);
+    musicIntervals.push(fp);
   }
 
   // ===== TIMELINE ENGINE =====
-  const TOTAL_DURATION = 48000; // 48 seconds total
-  let startTime = Date.now();
-  let paused = false;
-  let pauseOffset = 0;
-  let currentScene = -1;
-  let animFrame;
+  const TOTAL_DURATION = 62000;
+  let startTime = Date.now(), paused = false, pauseOffset = 0, animFrame, executed = new Set();
 
-  // Timeline events: [timeMs, action]
   const timeline = [
-    // Scene 0: Opening black (0-1s) — music starts
     [0, () => { showScene(0); initAudio(); }],
-    [500, () => startForeboding()],
+    [400, () => startForeboding()],
 
-    // Scene 1: Headlines (1-10s) — foreboding mood, tighter pacing
-    [1000, () => showScene(1)],
+    // crisis headlines
+    [1200, () => showScene(1)],
     [1500, () => { showHeadline(0); playImpact(); }],
-    [3200, () => { hideHeadline(0); flashRed(); playImpact(); }],
-    [3700, () => showHeadline(1)],
-    [5400, () => hideHeadline(1)],
-    [5900, () => showHeadline(2)],
-    [7400, () => hideHeadline(2)],
-    [7900, () => { showHeadline(3); flashRed(); playImpact(); }],
-    [9400, () => hideHeadline(3)],
-    [9800, () => showHeadline(4)],
+    [3400, () => { hideHeadline(0); flashRed(); playImpact(); }],
+    [3900, () => showHeadline(1)],
+    [5700, () => hideHeadline(1)],
+    [6100, () => { showHeadline(2); playImpact(); }],
+    [7900, () => hideHeadline(2)],
+    [8300, () => { showHeadline(3); flashRed(); }],
+    [10000, () => hideHeadline(3)],
+    [10400, () => showHeadline(4)],
+    [12000, () => hideHeadline(4)],
+    [12400, () => { showHeadline(5); flashRed(); playImpact(); }],
+    [14000, () => hideHeadline(5)],
 
-    // Scene 2: The Question (11-13s) — whoosh transition
-    [11000, () => { showScene(2); playWhoosh(); }],
+    // Phase 1 title
+    [14600, () => { showScene(2); playWhoosh(); startTrading(); }],
 
-    // Scene 3: Game Reveal (13-18s) — switch to trading mood
-    [13000, () => { showScene(3); playWhoosh(); startTrading(); }],
-    [13800, () => showFeatureCard(0)],
-    [14200, () => showFeatureCard(1)],
-    [14600, () => showFeatureCard(2)],
-    [15000, () => showFeatureCard(3)],
-    [15400, () => showFeatureCard(4)],
-    [15800, () => showFeatureCard(5)],
+    // Merit order diagram
+    [17800, () => { showScene(3); playWhoosh(); }],
+    [18300, () => { document.getElementById('moWrap').classList.add('go'); }],
+    [19600, () => { const c=document.getElementById('moClear'); c.classList.add('on'); playImpact(); }],
+    [20200, () => document.getElementById('moCap').classList.add('on')],
 
-    // Scene 3B: Screenshots (18-24s) — still trading mood
-    [18000, () => { showScene3b(); playWhoosh(); }],
-    [18600, () => showScreenshot(0)],
-    [19200, () => showScreenshot(1)],
-    [19800, () => showScreenshot(2)],
-    [20400, () => showScreenshot(3)],
-    [21000, () => showScreenshot(4)],
-    [21600, () => showScreenshot(5)],
+    // Phase 1 features
+    [23500, () => { showScene(4); playWhoosh(); }],
+    [24000, () => showEl('fc-0')], [24350, () => showEl('fc-1')],
+    [24700, () => { showEl('fc-2'); playImpact(); }], [25050, () => showEl('fc-3')], [25400, () => showEl('fc-4')],
 
-    // Scene 4: How It Works (24-32s) — trading continues
-    [24000, () => { showScene(4); playWhoosh(); }],
-    [24800, () => showStep(0)],
-    [26400, () => showStep(1)],
-    [28000, () => showStep(2)],
-    [29600, () => showStep(3)],
+    // The turn
+    [27800, () => { showScene(5); playWhoosh(); }],
+    [28700, () => playImpact()],
 
-    // Scene 5: Vibe Coding (32-40s) — switch to digital/quirky mood
-    [32000, () => { showScene(5); playWhoosh(); startDigital(); startTyping(); }],
+    // Expansion title
+    [30400, () => { showScene(6); playRiser(1.2); startEpic(); }],
 
-    // Scene 6: Finale (40-48s) — triumphant fanfare
-    [40000, () => { showScene(6); playWhoosh(); startTriumphant(); }],
+    // Expansion phases
+    [33800, () => { showScene(7); playWhoosh(); }],
+    [34300, () => showEl('ph-0')], [35100, () => showEl('ph-1')],
+    [35900, () => showEl('ph-2')], [36700, () => showEl('ph-3')],
+    [37500, () => { showEl('ph-4'); playImpact(); }],
+
+    // Summary montage
+    [42000, () => { showScene(8); playWhoosh(); }],
+    [42300, () => { showEl('vb-0'); playNote(392,0.12,'triangle',0.08); }],
+    [42800, () => { showEl('vb-1'); playNote(523,0.12,'triangle',0.08); }],
+    [43300, () => { showEl('vb-2'); playNote(659,0.12,'triangle',0.08); }],
+    [43800, () => { showEl('vb-3'); playImpact(); }],
+    [44400, () => { for (let i=0;i<9;i++) setTimeout(()=>showEl('ch-'+i), i*120); }],
+
+    // Finale
+    [48500, () => { showScene(9); playRiser(1.4); startTriumphant(); }],
+    [49200, () => showEl('ft-0')],
+    [50600, () => showEl('ft-1')],
+    [51600, () => { showEl('ft-2'); playImpact(); }],
+    [52400, () => showEl('ft-3')],
   ];
 
-  let executed = new Set();
-
-  function getElapsed() {
-    if (paused) return pauseOffset;
-    return Date.now() - startTime + pauseOffset;
-  }
-
+  function getElapsed() { return paused ? pauseOffset : Date.now() - startTime + pauseOffset; }
   function tick() {
     const elapsed = getElapsed();
-    const progress = Math.min(elapsed / TOTAL_DURATION * 100, 100);
-    document.getElementById('progressBar').style.width = progress + '%';
-
-    timeline.forEach(([time, action], i) => {
-      if (elapsed >= time && !executed.has(i)) {
-        executed.add(i);
-        action();
-      }
-    });
-
-    if (!paused && elapsed < TOTAL_DURATION + 2000) {
-      animFrame = requestAnimationFrame(tick);
-    }
+    document.getElementById('progressBar').style.width = Math.min(elapsed/TOTAL_DURATION*100,100) + '%';
+    timeline.forEach(([t, action], i) => { if (elapsed >= t && !executed.has(i)) { executed.add(i); action(); } });
+    if (!paused && elapsed < TOTAL_DURATION + 3000) animFrame = requestAnimationFrame(tick);
   }
 
-  // ===== SCENE MANAGEMENT =====
   function showScene(n) {
-    document.querySelectorAll('.scene').forEach(s => {
-      s.classList.remove('active');
-    });
-    const el = document.getElementById('scene-' + n);
-    if (el) el.classList.add('active');
-    currentScene = n;
-  }
-
-  function showScene3b() {
     document.querySelectorAll('.scene').forEach(s => s.classList.remove('active'));
-    const el = document.getElementById('scene-3b');
-    if (el) el.classList.add('active');
-    currentScene = '3b';
+    const el = document.getElementById('scene-' + n); if (el) el.classList.add('active');
   }
+  function showEl(id) { const el = document.getElementById(id); if (el) el.classList.add('visible'); }
+  function showHeadline(n) { const el = document.getElementById('hl-'+n); if (el) { el.classList.add('visible'); el.classList.remove('fade-out'); } }
+  function hideHeadline(n) { const el = document.getElementById('hl-'+n); if (el) { el.classList.remove('visible'); el.classList.add('fade-out'); } }
+  function flashRed() { const el = document.getElementById('redFlash'); el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); setTimeout(() => { el.classList.remove('flash'); el.style.opacity = '0'; }, 700); }
 
-  function showScreenshot(n) {
-    const el = document.getElementById('ss-' + n);
-    if (el) el.classList.add('visible');
-  }
-
-  function showHeadline(n) {
-    const el = document.getElementById('hl-' + n);
-    if (el) { el.classList.add('visible'); el.classList.remove('fade-out'); }
-  }
-  function hideHeadline(n) {
-    const el = document.getElementById('hl-' + n);
-    if (el) { el.classList.remove('visible'); el.classList.add('fade-out'); }
-  }
-
-  function flashRed() {
-    const el = document.getElementById('redFlash');
-    el.classList.remove('flash');
-    void el.offsetWidth; // force reflow
-    el.classList.add('flash');
-  }
-
-  function showFeatureCard(n) {
-    const el = document.getElementById('fc-' + n);
-    if (el) el.classList.add('visible');
-  }
-
-  function showStep(n) {
-    const el = document.getElementById('step-' + n);
-    if (el) el.classList.add('visible');
-  }
-
-  // Typing animation for vibe coding prompt
-  const promptText = '"Build a multiplayer energy market game where teams bid generators into a merit order..."';
-  let typingIndex = 0;
-  let typingTimer;
-
-  function startTyping() {
-    typingIndex = 0;
-    const el = document.getElementById('typingPrompt');
-    el.innerHTML = '<span class="prompt-cursor"></span>';
-
-    typingTimer = setInterval(() => {
-      if (typingIndex < promptText.length) {
-        el.innerHTML = promptText.substring(0, typingIndex + 1) + '<span class="prompt-cursor"></span>';
-        typingIndex++;
-      } else {
-        clearInterval(typingTimer);
-        // Show result after typing done
-        setTimeout(() => {
-          document.getElementById('resultText').style.opacity = '1';
-        }, 500);
-        // Show vibe stats staggered
-        setTimeout(() => { const e = document.getElementById('vs-0'); if(e) e.classList.add('visible'); }, 800);
-        setTimeout(() => { const e = document.getElementById('vs-1'); if(e) e.classList.add('visible'); }, 1100);
-        setTimeout(() => { const e = document.getElementById('vs-2'); if(e) e.classList.add('visible'); }, 1400);
-      }
-    }, 40);
-  }
-
-  // ===== CONTROLS =====
-
-  // Mute toggle
+  // ===== controls =====
   document.getElementById('btnMute').addEventListener('click', () => {
     musicMuted = !musicMuted;
     document.getElementById('btnMute').innerHTML = musicMuted ? '&#128264;' : '&#128266;';
-    if (musicMuted) {
-      stopAllMusic();
-    }
+    if (musicMuted) stopAllMusic();
   });
-
   document.getElementById('btnPause').addEventListener('click', () => {
-    if (paused) {
-      paused = false;
-      startTime = Date.now();
-      document.getElementById('btnPause').innerHTML = '&#10074;&#10074;';
-      tick();
-    } else {
-      paused = true;
-      pauseOffset = getElapsed();
-      document.getElementById('btnPause').innerHTML = '&#9654;';
-      cancelAnimationFrame(animFrame);
-      stopAllMusic();
-    }
+    if (paused) { paused = false; startTime = Date.now(); document.getElementById('btnPause').innerHTML = '&#10074;&#10074;'; tick(); }
+    else { paused = true; pauseOffset = getElapsed(); document.getElementById('btnPause').innerHTML = '&#9654;'; cancelAnimationFrame(animFrame); stopAllMusic(); }
   });
-
-  document.getElementById('btnRestart').addEventListener('click', () => {
-    // Reset everything
-    stopAllMusic();
-    executed.clear();
-    pauseOffset = 0;
-    paused = false;
-    startTime = Date.now();
-    currentScene = -1;
-    clearInterval(typingTimer);
-    document.getElementById('btnPause').innerHTML = '&#10074;&#10074;';
-
-    // Reset visuals
-    document.querySelectorAll('.headline').forEach(el => { el.classList.remove('visible', 'fade-out'); });
-    document.querySelectorAll('.feature-card').forEach(el => el.classList.remove('visible'));
-    document.querySelectorAll('.screenshot-card').forEach(el => el.classList.remove('visible'));
-    document.querySelectorAll('.step-row').forEach(el => el.classList.remove('visible'));
-    document.querySelectorAll('.stat').forEach(el => el.classList.remove('visible'));
-    document.querySelectorAll('.vibe-stat').forEach(el => el.classList.remove('visible'));
-    document.getElementById('typingPrompt').innerHTML = '';
-    document.getElementById('resultText').style.opacity = '0';
-    document.getElementById('progressBar').style.width = '0%';
-
-    cancelAnimationFrame(animFrame);
-    tick();
-  });
-
-  document.getElementById('btnSkip').addEventListener('click', () => {
-    // Jump to finale
-    pauseOffset = 40000;
-    startTime = Date.now();
-    paused = false;
-    document.getElementById('btnPause').innerHTML = '&#10074;&#10074;';
-    cancelAnimationFrame(animFrame);
-    tick();
-  });
-
-  document.getElementById('btnFullscreen').addEventListener('click', () => {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch(() => {});
-      document.getElementById('btnFullscreen').innerHTML = '&#x2716;';
-      document.getElementById('btnFullscreen').title = 'Exit Fullscreen';
-    } else {
-      document.exitFullscreen();
-      document.getElementById('btnFullscreen').innerHTML = '&#x26F6;';
-      document.getElementById('btnFullscreen').title = 'Fullscreen';
-    }
-  });
-
-  document.addEventListener('fullscreenchange', () => {
-    if (!document.fullscreenElement) {
-      document.getElementById('btnFullscreen').innerHTML = '&#x26F6;';
-      document.getElementById('btnFullscreen').title = 'Fullscreen';
-    }
-  });
-
-  // Keyboard controls (only active after trailer starts)
-  document.addEventListener('keydown', (e) => {
-    if (!started) return;
-    // Any keypress initialises audio context (browser autoplay policy)
-    initAudio();
-    if (e.code === 'Space') {
-      e.preventDefault();
-      document.getElementById('btnPause').click();
-    } else if (e.code === 'KeyR') {
-      document.getElementById('btnRestart').click();
-    } else if (e.code === 'KeyM') {
-      document.getElementById('btnMute').click();
-    } else if (e.code === 'ArrowRight') {
-      // Skip forward 5 seconds
-      pauseOffset = getElapsed() + 5000;
-      startTime = Date.now();
-      if (!paused) { cancelAnimationFrame(animFrame); tick(); }
-    } else if (e.code === 'KeyF') {
-      document.getElementById('btnFullscreen').click();
-    } else if (e.code === 'ArrowLeft') {
-      // Skip back 5 seconds
-      pauseOffset = Math.max(0, getElapsed() - 5000);
-      startTime = Date.now();
-      executed.clear();
-      if (!paused) { cancelAnimationFrame(animFrame); tick(); }
-    }
-  });
-
-  // ===== CLICK-TO-START =====
-  // Browser autoplay policy requires user gesture before AudioContext works.
-  // The overlay captures the first interaction, inits audio, then starts timeline.
-  function startTrailer() {
-    if (started) return;
-    started = true;
-    // Remove overlay
-    const overlay = document.getElementById('startOverlay');
-    if (overlay) {
-      overlay.style.transition = 'opacity 0.6s ease';
-      overlay.style.opacity = '0';
-      setTimeout(() => overlay.remove(), 700);
-    }
-    // Init audio on this user gesture
-    initAudio();
-    // Start timeline
-    startTime = Date.now();
-    pauseOffset = 0;
-    tick();
+  function resetVisuals() {
+    document.querySelectorAll('.headline').forEach(el => el.classList.remove('visible','fade-out'));
+    document.querySelectorAll('.fcard,.verb,.chip,.finale-tag,.finale-brand,.finale-sub').forEach(el => el.classList.remove('visible'));
+    const w = document.getElementById('moWrap'); w.classList.remove('go');
+    document.getElementById('moClear').classList.remove('on'); document.getElementById('moCap').classList.remove('on');
   }
-
-  document.getElementById('startOverlay').addEventListener('click', startTrailer);
-  document.addEventListener('keydown', function startOnKey(e) {
-    if (!started && (e.code === 'Space' || e.code === 'Enter')) {
-      e.preventDefault();
-      startTrailer();
-      document.removeEventListener('keydown', startOnKey);
-    }
+  document.getElementById('btnRestart').addEventListener('click', () => {
+    stopAllMusic(); executed.clear(); pauseOffset = 0; paused = false; startTime = Date.now();
+    document.getElementById('btnPause').innerHTML = '&#10074;&#10074;';
+    resetVisuals(); document.getElementById('progressBar').style.width = '0%';
+    cancelAnimationFrame(animFrame); tick();
   });
+  document.getElementById('btnSkip').addEventListener('click', () => {
+    pauseOffset = 48500; startTime = Date.now(); paused = false; executed.clear();
+    document.getElementById('btnPause').innerHTML = '&#10074;&#10074;';
+    cancelAnimationFrame(animFrame); tick();
+  });
+  document.getElementById('btnFullscreen').addEventListener('click', () => {
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{});
+    else document.exitFullscreen();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (!started) return; initAudio();
+    if (e.code==='Space'){ e.preventDefault(); document.getElementById('btnPause').click(); }
+    else if (e.code==='KeyR') document.getElementById('btnRestart').click();
+    else if (e.code==='KeyM') document.getElementById('btnMute').click();
+    else if (e.code==='KeyF') document.getElementById('btnFullscreen').click();
+    else if (e.code==='ArrowRight'){ pauseOffset = getElapsed()+5000; startTime = Date.now(); if(!paused){cancelAnimationFrame(animFrame);tick();} }
+    else if (e.code==='ArrowLeft'){ pauseOffset = Math.max(0,getElapsed()-5000); startTime = Date.now(); executed.clear(); resetVisuals(); if(!paused){cancelAnimationFrame(animFrame);tick();} }
+  });
+
+  // ===== click-to-start =====
+  function startTrailer() {
+    if (started) return; started = true;
+    const overlay = document.getElementById('startOverlay');
+    if (overlay) { overlay.style.transition='opacity .6s ease'; overlay.style.opacity='0'; setTimeout(()=>overlay.remove(),700); }
+    initAudio(); startTime = Date.now(); pauseOffset = 0; tick();
+  }
+  document.getElementById('startOverlay').addEventListener('click', startTrailer);
+  document.addEventListener('keydown', function onKey(e){ if (!started && (e.code==='Space'||e.code==='Enter')){ e.preventDefault(); startTrailer(); document.removeEventListener('keydown', onKey);} });
 })();
 </script>
-
 </body>
-</html>`;
+</html>
+`;
 }
