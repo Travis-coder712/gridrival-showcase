@@ -1,6 +1,5 @@
 /**
- * GridRival cinematic trailer (v5 - sustained backing, staggered CTA,
- * "real penalties" at the base). Procedurally scored; served at /api/trailer.
+ * GridRival cinematic trailer. Procedurally scored; served at /api/trailer.
  */
 export function getCinematicTrailerHTML(): string {
   return `<!doctype html>
@@ -99,6 +98,9 @@ export function getCinematicTrailerHTML(): string {
   .cta-event { font-size: clamp(20px,3.6vw,40px); font-weight: 800; margin-top: 18px; opacity: 0; }
   .cta-event.visible { animation: fadeUp .7s ease forwards; }
   .cta-date { display: block; font-family: var(--mono); font-size: clamp(17px,2.8vw,28px); letter-spacing: .22em; text-transform: uppercase; color: var(--gold); margin-top: 12px; }
+  .cta-teaser { margin-top: 30px; font-family: var(--mono); font-size: clamp(14px,2.3vw,25px); letter-spacing: .03em; color: var(--electric-2); opacity: 0; }
+  .cta-teaser.visible { animation: fadeUp .7s ease forwards; }
+  .cta-teaser .q { color: var(--warning); font-weight: 800; }
 
   .turn-1 { font-size: clamp(22px,4.4vw,50px); font-weight: 800; color: var(--muted); opacity: 0; animation: fadeUp .6s .1s ease forwards; max-width: min(900px,92vw); text-wrap: balance; }
   .turn-2 { font-size: clamp(30px,7vw,84px); font-weight: 900; letter-spacing: -.02em; color: #fff; opacity: 0; animation: slamIn .6s .9s cubic-bezier(.2,1.3,.3,1) forwards; margin-top: 10px; }
@@ -369,6 +371,7 @@ export function getCinematicTrailerHTML(): string {
     <div class="cta-label" id="cta-0">Play it for real</div>
     <div class="cta-title" id="cta-1">Come play.</div>
     <div class="cta-event" id="cta-2"><span class="glow-gold">GridRival</span> &middot; PD Team Day<span class="cta-date">September 1</span></div>
+    <div class="cta-teaser" id="cta-3">Will Duncan attend the prelim final&hellip; <span class="q">or not???</span></div>
   </div>
 
   <div class="ticker-bar"><div class="ticker-content" id="tickerContent"></div></div>
@@ -479,7 +482,7 @@ export function getCinematicTrailerHTML(): string {
   }
 
   // ===== timeline =====
-  const TOTAL_DURATION = 95000;
+  const TOTAL_DURATION = 97000;
   let startTime = Date.now(), paused = false, pauseOffset = 0, animFrame, executed = new Set();
 
   const timeline = [
@@ -563,6 +566,7 @@ export function getCinematicTrailerHTML(): string {
     [87500, () => showEl('cta-0')],   // PLAY IT FOR REAL
     [89400, () => showEl('cta-2')],   // GridRival · PD Team Day / September 1
     [91600, () => { showEl('cta-1'); playImpact(); }],   // Come play.  (the punch, last)
+    [93700, () => { showEl('cta-3'); playNote(523,0.12,'triangle',0.06); setTimeout(()=>playNote(494,0.12,'triangle',0.05),160); setTimeout(()=>playNote(587,0.22,'triangle',0.06),340); }],  // cheeky cliffhanger
   ];
 
   function getElapsed() { return paused ? pauseOffset : Date.now() - startTime + pauseOffset; }
@@ -582,7 +586,7 @@ export function getCinematicTrailerHTML(): string {
   document.getElementById('btnPause').addEventListener('click', () => { if (paused) { paused = false; startTime = Date.now(); document.getElementById('btnPause').innerHTML = '&#10074;&#10074;'; tick(); } else { paused = true; pauseOffset = getElapsed(); document.getElementById('btnPause').innerHTML = '&#9654;'; cancelAnimationFrame(animFrame); stopAllMusic(); } });
   function resetVisuals() {
     document.querySelectorAll('.headline').forEach(el => el.classList.remove('visible','fade-out'));
-    document.querySelectorAll('.fcard,.verb,.chip,.finale-tag,.finale-brand,.finale-sub,.rule,.cta-label,.cta-title,.cta-event').forEach(el => el.classList.remove('visible'));
+    document.querySelectorAll('.fcard,.verb,.chip,.finale-tag,.finale-brand,.finale-sub,.rule,.cta-label,.cta-title,.cta-event,.cta-teaser').forEach(el => el.classList.remove('visible'));
     document.getElementById('realPen').classList.remove('on');
     document.getElementById('moWrap').classList.remove('go'); document.getElementById('moClear').classList.remove('on'); document.getElementById('moCap').classList.remove('on');
     document.getElementById('basisRow').classList.remove('go'); document.getElementById('basisBadge').classList.remove('on'); document.getElementById('basisCap').classList.remove('on');
