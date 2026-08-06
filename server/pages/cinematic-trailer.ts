@@ -386,7 +386,7 @@ export function getCinematicTrailerHTML(): string {
     <div class="bolt">&#9889;</div>
     <div class="st-brand glow-electric">GRIDRIVAL</div>
     <div class="st-play">&#9654; Play Trailer</div>
-    <div class="st-note">with sound &middot; ~95 seconds</div>
+    <div class="st-note">with sound &middot; ~99 seconds</div>
   </div>
 </div>
 
@@ -478,7 +478,7 @@ export function getCinematicTrailerHTML(): string {
   }
 
   // ===== timeline =====
-  const TOTAL_DURATION = 95000;
+  const TOTAL_DURATION = 99000;
   let startTime = Date.now(), paused = false, pauseOffset = 0, animFrame, executed = new Set();
 
   const timeline = [
@@ -510,58 +510,59 @@ export function getCinematicTrailerHTML(): string {
     [31500, () => { showScene(5); playWhoosh(); }],
     [32400, () => playImpact()],
 
-    [34500, () => { showScene(6); playRiser(1.2); startEpic(); }],
+    // FULL POSITION title — extra dwell here, and on the turn before it
+    [36000, () => { showScene(6); playRiser(1.2); startEpic(); }],
 
-    // BASIS (longer dwell)
-    [38000, () => { showScene('basis'); playWhoosh(); }],
-    [38600, () => { document.getElementById('basisRow').classList.add('go'); document.getElementById('saP').textContent = '$155'; document.getElementById('saP').style.color = 'var(--sa)'; document.getElementById('linkStat').textContent = 'FULL'; }],
-    [39800, () => { document.getElementById('basisBadge').classList.add('on'); playImpact(); }],
-    [40400, () => document.getElementById('basisCap').classList.add('on')],
+    // BASIS (holds on the title ~5.5s before this)
+    [41500, () => { showScene('basis'); playWhoosh(); }],
+    [42100, () => { document.getElementById('basisRow').classList.add('go'); document.getElementById('saP').textContent = '$155'; document.getElementById('saP').style.color = 'var(--sa)'; document.getElementById('linkStat').textContent = 'FULL'; }],
+    [43300, () => { document.getElementById('basisBadge').classList.add('on'); playImpact(); }],
+    [43900, () => document.getElementById('basisCap').classList.add('on')],
 
     // CAPS
-    [45500, () => { showScene('caps'); playWhoosh(); }],
-    [46000, () => { const s = document.getElementById('capSpot'); let v = 80; const t = setInterval(() => { v += 90; if (v >= 620) { v = 620; clearInterval(t); } s.textContent = '$' + v; }, 130); }],
-    [47400, () => { document.getElementById('capPay').classList.add('on'); playChime(660); }],
-    [48000, () => document.getElementById('capDeal').classList.add('on')],
-    [48600, () => document.getElementById('capsCap').classList.add('on')],
+    [49000, () => { showScene('caps'); playWhoosh(); }],
+    [49500, () => { const s = document.getElementById('capSpot'); let v = 80; const t = setInterval(() => { v += 90; if (v >= 620) { v = 620; clearInterval(t); } s.textContent = '$' + v; }, 130); }],
+    [50900, () => { document.getElementById('capPay').classList.add('on'); playChime(660); }],
+    [51500, () => document.getElementById('capDeal').classList.add('on')],
+    [52100, () => document.getElementById('capsCap').classList.add('on')],
 
     // LOAD SHAPE + DR
-    [53500, () => { showScene('load'); playWhoosh(); }],
-    [54000, () => document.getElementById('loadStage').classList.add('go')],
-    [55400, () => playChime(523)],
-    [55800, () => document.getElementById('loadCap').classList.add('on')],
+    [57000, () => { showScene('load'); playWhoosh(); }],
+    [57500, () => document.getElementById('loadStage').classList.add('go')],
+    [58900, () => playChime(523)],
+    [59300, () => document.getElementById('loadCap').classList.add('on')],
 
     // ELECTRIFICATION
-    [60500, () => { showScene('elec'); playWhoosh(); }],
-    [61000, () => document.getElementById('elecStage').classList.add('go')],
-    [62700, () => playChime(784)],
-    [63000, () => document.getElementById('elecCap').classList.add('on')],
+    [64000, () => { showScene('elec'); playWhoosh(); }],
+    [64500, () => document.getElementById('elecStage').classList.add('go')],
+    [66200, () => playChime(784)],
+    [66500, () => document.getElementById('elecCap').classList.add('on')],
 
     // REAL RULES + penalties
-    [68000, () => { showScene('rules'); playWhoosh(); }],
-    [68500, () => showEl('rl-0')], [69000, () => showEl('rl-1')], [69500, () => { showEl('rl-2'); playImpact(); }],
-    [71200, () => { document.getElementById('realPen').classList.add('on'); playImpact(); }],
+    [71500, () => { showScene('rules'); playWhoosh(); }],
+    [72000, () => showEl('rl-0')], [72500, () => showEl('rl-1')], [73000, () => { showEl('rl-2'); playImpact(); }],
+    [74700, () => { document.getElementById('realPen').classList.add('on'); playImpact(); }],
 
     // SUMMARY
-    [73800, () => { showScene(8); playWhoosh(); }],
-    [74100, () => { showEl('vb-0'); playNote(392,0.12,'triangle',0.08); }],
-    [74600, () => { showEl('vb-1'); playNote(523,0.12,'triangle',0.08); }],
-    [75100, () => { showEl('vb-2'); playNote(659,0.12,'triangle',0.08); }],
-    [75600, () => { showEl('vb-3'); playImpact(); }],
-    [76200, () => { for (let i=0;i<9;i++) setTimeout(()=>showEl('ch-'+i), i*110); }],
+    [77300, () => { showScene(8); playWhoosh(); }],
+    [77600, () => { showEl('vb-0'); playNote(392,0.12,'triangle',0.08); }],
+    [78100, () => { showEl('vb-1'); playNote(523,0.12,'triangle',0.08); }],
+    [78600, () => { showEl('vb-2'); playNote(659,0.12,'triangle',0.08); }],
+    [79100, () => { showEl('vb-3'); playImpact(); }],
+    [79700, () => { for (let i=0;i<9;i++) setTimeout(()=>showEl('ch-'+i), i*110); }],
 
     // FINALE — dark and tense (fanfare moves to the CTA)
-    [80000, () => { showScene(9); startFinaleTension(); }],
-    [80800, () => showEl('ft-0')],
-    [82300, () => { showEl('ft-1'); playImpact(); }],
-    [83500, () => { showEl('ft-2'); playImpact(); }],
-    [84300, () => showEl('ft-3')],
+    [83500, () => { showScene(9); startFinaleTension(); }],
+    [84300, () => showEl('ft-0')],
+    [85800, () => { showEl('ft-1'); playImpact(); }],
+    [87000, () => { showEl('ft-2'); playImpact(); }],
+    [87800, () => showEl('ft-3')],
 
     // CALL TO ACTION — uplifting pings land here; lines arrive one at a time, "Come play." last
-    [86500, () => { showScene('cta'); playRiser(1.2); startTriumphant(); }],
-    [87500, () => showEl('cta-0')],   // PLAY IT FOR REAL
-    [89400, () => showEl('cta-2')],   // GridRival · PD Team Day / September 1
-    [91600, () => { showEl('cta-1'); playImpact(); }],   // Come play.  (the punch, last)
+    [90000, () => { showScene('cta'); playRiser(1.2); startTriumphant(); }],
+    [91000, () => showEl('cta-0')],   // PLAY IT FOR REAL
+    [92900, () => showEl('cta-2')],   // GridRival · PD Team Day / September 1
+    [95100, () => { showEl('cta-1'); playImpact(); }],   // Come play.  (the punch, last)
   ];
 
   function getElapsed() { return paused ? pauseOffset : Date.now() - startTime + pauseOffset; }
@@ -592,7 +593,7 @@ export function getCinematicTrailerHTML(): string {
     document.getElementById('redFlash').style.opacity = '0';
   }
   document.getElementById('btnRestart').addEventListener('click', () => { stopAllMusic(); executed.clear(); pauseOffset = 0; paused = false; startTime = Date.now(); document.getElementById('btnPause').innerHTML = '&#10074;&#10074;'; resetVisuals(); document.getElementById('progressBar').style.width = '0%'; cancelAnimationFrame(animFrame); tick(); });
-  document.getElementById('btnSkip').addEventListener('click', () => { pauseOffset = 80000; startTime = Date.now(); paused = false; executed.clear(); document.getElementById('btnPause').innerHTML = '&#10074;&#10074;'; cancelAnimationFrame(animFrame); tick(); });
+  document.getElementById('btnSkip').addEventListener('click', () => { pauseOffset = 83500; startTime = Date.now(); paused = false; executed.clear(); document.getElementById('btnPause').innerHTML = '&#10074;&#10074;'; cancelAnimationFrame(animFrame); tick(); });
   document.getElementById('btnFullscreen').addEventListener('click', () => { if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{}); else document.exitFullscreen(); });
   document.addEventListener('keydown', (e) => {
     if (!started) return; initAudio();
