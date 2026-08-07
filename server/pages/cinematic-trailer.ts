@@ -40,12 +40,13 @@ export function getCinematicTrailerHTML(): string {
   .headline { position: absolute; max-width: 92vw; font-size: clamp(28px, 6vw, 74px); font-weight: 800; line-height: 1.02; letter-spacing: -.02em; opacity: 0; transform: translateY(28px) scale(.98); text-wrap: balance; transition: opacity .35s ease, transform .35s ease; }
   .headline.visible { opacity: 1; transform: translateY(0) scale(1); }
   .headline.fade-out { opacity: 0; transform: translateY(-24px) scale(1.02); }
-  .headline .src { display:block; font-family: var(--mono); font-size: clamp(10px,1.3vw,13px); font-weight: 500; letter-spacing:.2em; color: var(--muted); text-transform: uppercase; margin-bottom: 14px; }
+  .headline .src { display:block; font-family: var(--mono); font-size: clamp(12px,1.8vw,18px); font-weight: 600; letter-spacing:.22em; color: var(--electric-2); text-transform: uppercase; margin-bottom: 16px; }
   .headline .red { color: var(--loss); } .headline .amber { color: var(--warning); } .headline .elec { color: var(--electric-2); }
 
   .phase-label { font-family: var(--mono); font-size: clamp(12px,2vw,18px); letter-spacing: .5em; text-transform: uppercase; color: var(--electric); margin-bottom: 18px; opacity: 0; animation: fadeUp .7s .1s ease forwards; }
   .brand { font-size: clamp(40px, 10vw, 132px); font-weight: 900; letter-spacing: -.03em; line-height: .92; }
   .brand .sub { display:block; font-size: .42em; font-weight: 800; letter-spacing: .02em; margin-top: 8px; }
+  .brand .colon { font-size: .72em; opacity: .82; }
   .title-reveal .brand { opacity: 0; animation: slamIn .6s .15s cubic-bezier(.2,1.3,.3,1) forwards; }
   .glow-electric { color: #fff; text-shadow: 0 0 50px rgba(52,161,255,.75), 0 0 120px rgba(52,161,255,.35); }
   .glow-gold { color: #fff; text-shadow: 0 0 50px rgba(255,207,92,.7), 0 0 130px rgba(255,207,92,.35); }
@@ -55,6 +56,11 @@ export function getCinematicTrailerHTML(): string {
 
   /* diagram framework */
   .dh { font-family: var(--mono); font-size: clamp(11px,1.6vw,15px); letter-spacing:.3em; text-transform: uppercase; color: var(--electric); margin-bottom: 20px; }
+  /* running phase-brand header on each content slide */
+  .phase-tag { font-family: var(--mono); font-size: clamp(11px,1.5vw,15px); font-weight: 700; letter-spacing:.22em; text-transform: uppercase; margin-bottom: 16px; }
+  .phase-tag .b { color: var(--muted); font-weight: 600; }
+  .phase-tag.mo { color: var(--electric-2); }
+  .phase-tag.fp { color: var(--gold); }
   /* big dramatic hero line on each mechanic slide */
   .drama { font-weight: 900; font-size: clamp(26px,6vw,56px); line-height: 1.02; letter-spacing: -.02em; text-transform: uppercase; text-align: center; text-wrap: balance; color: var(--ink); margin: -6px 0 26px; opacity: 0; transform: translateY(16px) scale(.94); transition: opacity .55s ease, transform .55s cubic-bezier(.2,1.3,.3,1); text-shadow: 0 0 34px rgba(90,160,255,.18); }
   .drama.on { opacity: 1; transform: none; }
@@ -236,12 +242,13 @@ export function getCinematicTrailerHTML(): string {
   <!-- Phase 1 title -->
   <div class="scene title-reveal" id="scene-2">
     <div class="phase-label">The Fundamentals</div>
-    <div class="brand"><span class="glow-electric">GRIDRIVAL</span><span class="sub glow-electric">MERIT ORDER</span></div>
+    <div class="brand"><span class="glow-electric">GRIDRIVAL<span class="colon">:</span></span><span class="sub glow-electric">MERIT ORDER</span></div>
     <div class="tagline-lead" style="margin-top:18px;color:var(--muted)">Learn how the market really clears.</div>
   </div>
 
   <!-- merit order diagram -->
   <div class="scene" id="scene-3">
+    <div class="phase-tag mo"><span class="b">GridRival:</span> Merit Order</div>
     <div class="diagram">
       <h3 class="dh">How the market clears</h3>
       <div class="mo-wrap" id="moWrap">
@@ -262,6 +269,7 @@ export function getCinematicTrailerHTML(): string {
 
   <!-- Phase 1 features -->
   <div class="scene" id="scene-4">
+    <div class="phase-tag mo"><span class="b">GridRival:</span> Merit Order</div>
     <div class="sect-title">One market. <span class="accent">Every dynamic.</span></div>
     <div class="card-grid">
       <div class="fcard" id="fc-0"><div class="ic">&#128101;</div><div class="t">Multiplayer</div><div class="d">Up to 15 teams bidding live from their phones</div></div>
@@ -280,13 +288,14 @@ export function getCinematicTrailerHTML(): string {
 
   <!-- expansion title -->
   <div class="scene title-reveal" id="scene-6">
-    <div class="phase-label" style="color:var(--gold)">GridRival presents</div>
-    <div class="brand"><span class="glow-gold">THE EXPANSION</span><span class="sub glow-gold">FULL POSITION</span></div>
+    <div class="phase-label" style="color:var(--gold)">The Expansion</div>
+    <div class="brand"><span class="glow-gold">GRIDRIVAL<span class="colon">:</span></span><span class="sub glow-gold">FULL POSITION</span></div>
     <div class="tagline-lead" style="margin-top:18px;color:var(--muted)">Stop bidding plant. Start running a book.</div>
   </div>
 
   <!-- BASIS diagram -->
   <div class="scene" id="scene-basis">
+    <div class="phase-tag fp"><span class="b">GridRival:</span> Full Position</div>
     <h3 class="dh">Basis risk &middot; interconnectors</h3>
     <div class="drama" id="dramaBasis">One grid. <span class="hot">Two prices.</span></div>
     <div class="basis-row" id="basisRow">
@@ -300,6 +309,7 @@ export function getCinematicTrailerHTML(): string {
 
   <!-- CAPS diagram -->
   <div class="scene" id="scene-caps">
+    <div class="phase-tag fp"><span class="b">GridRival:</span> Full Position</div>
     <h3 class="dh">Caps &amp; swaps</h3>
     <div class="drama" id="dramaCaps"><span class="cool">Covered.</span> Or <span class="hot">burned.</span></div>
     <div class="cap-stage">
@@ -313,6 +323,7 @@ export function getCinematicTrailerHTML(): string {
 
   <!-- LOAD SHAPE + DR diagram -->
   <div class="scene" id="scene-load">
+    <div class="phase-tag fp"><span class="b">GridRival:</span> Full Position</div>
     <h3 class="dh">C&amp;I customers &middot; load shape &middot; demand response</h3>
     <div class="drama" id="dramaLoad"><span class="gold">Flat is gold.</span> <span class="hot">Peaky is pain.</span></div>
     <div class="load-stage" id="loadStage">
@@ -326,6 +337,7 @@ export function getCinematicTrailerHTML(): string {
 
   <!-- ELECTRIFICATION + projects diagram -->
   <div class="scene" id="scene-elec">
+    <div class="phase-tag fp"><span class="b">GridRival:</span> Full Position</div>
     <h3 class="dh">Electrification &middot; new projects to 2030</h3>
     <div class="drama" id="dramaElec">Build <span class="cool">2030</span> &mdash; or be left behind.</div>
     <div class="elec-stage" id="elecStage">
@@ -369,7 +381,7 @@ export function getCinematicTrailerHTML(): string {
   <div class="scene" id="scene-9">
     <div class="finale-tag" id="ft-0"><span class="dim">In the NEM, companies go bust every year.</span></div>
     <div class="finale-tag" id="ft-1" style="font-size:clamp(26px,5vw,58px);font-weight:900;margin-top:6px">Will you?</div>
-    <div class="finale-brand glow-electric" id="ft-2" style="margin-top:22px">THE EXPANSION</div>
+    <div class="finale-brand glow-electric" id="ft-2" style="margin-top:22px">GRIDRIVAL<span style="opacity:.82">:</span> FULL POSITION</div>
     <div class="finale-sub" id="ft-3" style="margin-top:10px">Bid &middot; Position &middot; Hedge &middot; Survive</div>
   </div>
 
@@ -377,7 +389,7 @@ export function getCinematicTrailerHTML(): string {
   <div class="scene" id="scene-cta">
     <div class="cta-label" id="cta-0">Play it for real</div>
     <div class="cta-title" id="cta-1">Come play.</div>
-    <div class="cta-event" id="cta-2"><span class="glow-gold">The Expansion</span> &middot; PD Team Day<span class="cta-date">September 1</span></div>
+    <div class="cta-event" id="cta-2"><span class="glow-gold">GridRival: Full Position</span> &middot; PD Team Day<span class="cta-date">September 1</span></div>
   </div>
 
   <div class="ticker-bar"><div class="ticker-content" id="tickerContent"></div></div>
