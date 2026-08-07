@@ -55,6 +55,12 @@ export function getCinematicTrailerHTML(): string {
 
   /* diagram framework */
   .dh { font-family: var(--mono); font-size: clamp(11px,1.6vw,15px); letter-spacing:.3em; text-transform: uppercase; color: var(--electric); margin-bottom: 20px; }
+  /* big dramatic hero line on each mechanic slide */
+  .drama { font-weight: 900; font-size: clamp(26px,6vw,56px); line-height: 1.02; letter-spacing: -.02em; text-transform: uppercase; text-align: center; text-wrap: balance; color: var(--ink); margin: -6px 0 26px; opacity: 0; transform: translateY(16px) scale(.94); transition: opacity .55s ease, transform .55s cubic-bezier(.2,1.3,.3,1); text-shadow: 0 0 34px rgba(90,160,255,.18); }
+  .drama.on { opacity: 1; transform: none; }
+  .drama .hot { color: var(--loss); text-shadow: 0 0 26px rgba(255,75,87,.45); }
+  .drama .cool { color: var(--electric-2); text-shadow: 0 0 26px rgba(52,161,255,.45); }
+  .drama .gold { color: var(--gold); text-shadow: 0 0 26px rgba(255,212,105,.45); }
   .dcap { margin-top: 30px; font-size: clamp(13px,1.9vw,18px); color: var(--muted); opacity: 0; transition: opacity .5s ease; max-width: min(760px,92vw); text-wrap: balance; }
   .dcap.on { opacity: 1; } .dcap b { color: var(--ink); }
 
@@ -274,14 +280,15 @@ export function getCinematicTrailerHTML(): string {
 
   <!-- expansion title -->
   <div class="scene title-reveal" id="scene-6">
-    <div class="phase-label" style="color:var(--gold)">The Expansion</div>
-    <div class="brand"><span class="glow-gold">GRIDRIVAL</span><span class="sub glow-gold">FULL POSITION</span></div>
+    <div class="phase-label" style="color:var(--gold)">GridRival presents</div>
+    <div class="brand"><span class="glow-gold">THE EXPANSION</span><span class="sub glow-gold">FULL POSITION</span></div>
     <div class="tagline-lead" style="margin-top:18px;color:var(--muted)">Stop bidding plant. Start running a book.</div>
   </div>
 
   <!-- BASIS diagram -->
   <div class="scene" id="scene-basis">
     <h3 class="dh">Basis risk &middot; interconnectors</h3>
+    <div class="drama" id="dramaBasis">One grid. <span class="hot">Two prices.</span></div>
     <div class="basis-row" id="basisRow">
       <div class="region vic"><div class="rn">VIC</div><div class="rp" id="vicP">$33</div><div class="rl">long &middot; exports</div></div>
       <div class="link"><div class="link-label">Heywood</div><div class="link-bar"><div class="link-fill"></div></div><div class="link-status" id="linkStat">flowing</div></div>
@@ -294,6 +301,7 @@ export function getCinematicTrailerHTML(): string {
   <!-- CAPS diagram -->
   <div class="scene" id="scene-caps">
     <h3 class="dh">Caps &amp; swaps</h3>
+    <div class="drama" id="dramaCaps"><span class="cool">Covered.</span> Or <span class="hot">burned.</span></div>
     <div class="cap-stage">
       <div class="cap-scen"><span class="cap-spot-label">Spot</span><span class="cap-spot" id="capSpot">$80</span></div>
       <div class="cap-strike">&#9472;&#9472; $300 cap strike &#9472;&#9472;</div>
@@ -306,6 +314,7 @@ export function getCinematicTrailerHTML(): string {
   <!-- LOAD SHAPE + DR diagram -->
   <div class="scene" id="scene-load">
     <h3 class="dh">C&amp;I customers &middot; load shape &middot; demand response</h3>
+    <div class="drama" id="dramaLoad"><span class="gold">Flat is gold.</span> <span class="hot">Peaky is pain.</span></div>
     <div class="load-stage" id="loadStage">
       <div class="cust"><div class="cn">Data centre<small>FLAT &middot; GOLD</small></div><div class="spark" style="--sc:var(--profit)"><i style="--h:60%"></i><i style="--h:62%"></i><i style="--h:60%"></i><i style="--h:63%"></i><i style="--h:61%"></i><i style="--h:60%"></i></div></div>
       <div class="cust"><div class="cn">CBD offices<small>PEAKY &middot; RISK</small></div><div class="spark" style="--sc:var(--warning)"><i style="--h:20%"></i><i style="--h:34%"></i><i style="--h:70%"></i><i style="--h:100%"></i><i style="--h:64%"></i><i style="--h:30%"></i></div></div>
@@ -318,6 +327,7 @@ export function getCinematicTrailerHTML(): string {
   <!-- ELECTRIFICATION + projects diagram -->
   <div class="scene" id="scene-elec">
     <h3 class="dh">Electrification &middot; new projects to 2030</h3>
+    <div class="drama" id="dramaElec">Build <span class="cool">2030</span> &mdash; or be left behind.</div>
     <div class="elec-stage" id="elecStage">
       <div class="elec-wrap">
         <div class="yr"><div class="proj" style="--ph:0%;--pd:.1s"></div><div class="dbar" style="--h:40%;--d:0s"></div><div class="yl">2025</div></div>
@@ -359,7 +369,7 @@ export function getCinematicTrailerHTML(): string {
   <div class="scene" id="scene-9">
     <div class="finale-tag" id="ft-0"><span class="dim">In the NEM, companies go bust every year.</span></div>
     <div class="finale-tag" id="ft-1" style="font-size:clamp(26px,5vw,58px);font-weight:900;margin-top:6px">Will you?</div>
-    <div class="finale-brand glow-electric" id="ft-2" style="margin-top:22px">GRIDRIVAL</div>
+    <div class="finale-brand glow-electric" id="ft-2" style="margin-top:22px">THE EXPANSION</div>
     <div class="finale-sub" id="ft-3" style="margin-top:10px">Bid &middot; Position &middot; Hedge &middot; Survive</div>
   </div>
 
@@ -367,7 +377,7 @@ export function getCinematicTrailerHTML(): string {
   <div class="scene" id="scene-cta">
     <div class="cta-label" id="cta-0">Play it for real</div>
     <div class="cta-title" id="cta-1">Come play.</div>
-    <div class="cta-event" id="cta-2"><span class="glow-gold">GridRival</span> &middot; PD Team Day<span class="cta-date">September 1</span></div>
+    <div class="cta-event" id="cta-2"><span class="glow-gold">The Expansion</span> &middot; PD Team Day<span class="cta-date">September 1</span></div>
   </div>
 
   <div class="ticker-bar"><div class="ticker-content" id="tickerContent"></div></div>
@@ -515,12 +525,14 @@ export function getCinematicTrailerHTML(): string {
 
     // BASIS (holds on the title ~5.5s before this)
     [41500, () => { showScene('basis'); playWhoosh(); }],
+    [41900, () => document.getElementById('dramaBasis').classList.add('on')],
     [42100, () => { document.getElementById('basisRow').classList.add('go'); document.getElementById('saP').textContent = '$155'; document.getElementById('saP').style.color = 'var(--sa)'; document.getElementById('linkStat').textContent = 'FULL'; }],
     [43300, () => { document.getElementById('basisBadge').classList.add('on'); playImpact(); }],
     [43900, () => document.getElementById('basisCap').classList.add('on')],
 
     // CAPS
     [49000, () => { showScene('caps'); playWhoosh(); }],
+    [49300, () => document.getElementById('dramaCaps').classList.add('on')],
     [49500, () => { const s = document.getElementById('capSpot'); let v = 80; const t = setInterval(() => { v += 90; if (v >= 620) { v = 620; clearInterval(t); } s.textContent = '$' + v; }, 130); }],
     [50900, () => { document.getElementById('capPay').classList.add('on'); playChime(660); }],
     [51500, () => document.getElementById('capDeal').classList.add('on')],
@@ -528,12 +540,14 @@ export function getCinematicTrailerHTML(): string {
 
     // LOAD SHAPE + DR
     [57000, () => { showScene('load'); playWhoosh(); }],
+    [57300, () => document.getElementById('dramaLoad').classList.add('on')],
     [57500, () => document.getElementById('loadStage').classList.add('go')],
     [58900, () => playChime(523)],
     [59300, () => document.getElementById('loadCap').classList.add('on')],
 
     // ELECTRIFICATION
     [64000, () => { showScene('elec'); playWhoosh(); }],
+    [64300, () => document.getElementById('dramaElec').classList.add('on')],
     [64500, () => document.getElementById('elecStage').classList.add('go')],
     [66200, () => playChime(784)],
     [66500, () => document.getElementById('elecCap').classList.add('on')],
