@@ -57,8 +57,8 @@ export function getCinematicTrailerHTML(): string {
   /* diagram framework */
   .dh { font-family: var(--mono); font-size: clamp(11px,1.6vw,15px); letter-spacing:.3em; text-transform: uppercase; color: var(--electric); margin-bottom: 20px; }
   /* running phase-brand header on each content slide */
-  .phase-tag { font-family: var(--mono); font-size: clamp(15px,2.4vw,24px); font-weight: 700; letter-spacing:.22em; text-transform: uppercase; margin-bottom: 18px; }
-  .phase-tag .b { color: var(--muted); font-weight: 600; }
+  .phase-tag { font-family: var(--sans); font-size: clamp(15px,2.5vw,25px); font-weight: 800; letter-spacing:.04em; text-transform: uppercase; margin-bottom: 18px; }
+  .phase-tag .b { color: var(--muted); font-weight: 700; }
   .phase-tag.mo { color: var(--electric-2); }
   .phase-tag.fp { color: var(--gold); }
   /* big dramatic hero line on each mechanic slide */
@@ -181,9 +181,6 @@ export function getCinematicTrailerHTML(): string {
   .verb { font-size: clamp(24px,5vw,60px); font-weight: 900; letter-spacing: -.02em; opacity: 0; }
   .verb.visible { animation: slamIn .5s cubic-bezier(.2,1.3,.3,1) forwards; }
   .verb.v0 { color: var(--electric-2); } .verb.v1 { color: var(--profit); } .verb.v2 { color: var(--warning); } .verb.v3 { color: var(--loss); }
-  .verbs.cta-verbs { margin-bottom: 0; margin-top: 18px; }
-  .verbs.cta-verbs .verb { font-size: clamp(18px,4.2vw,42px); }
-  .verbs.finale-verbs { margin-top: 18px; margin-bottom: 0; }
   .chips { display:flex; flex-wrap: wrap; gap: 8px; justify-content: center; max-width: min(900px,94vw); }
   .chip { font-family: var(--mono); font-size: clamp(10px,1.3vw,13px); border: 1px solid rgba(255,255,255,.16); border-radius: 999px; padding: 6px 13px; color: var(--muted); opacity: 0; transform: translateY(10px); transition: opacity .3s, transform .3s; }
   .chip.visible { opacity: 1; transform: none; color: var(--ink); }
@@ -192,7 +189,7 @@ export function getCinematicTrailerHTML(): string {
   .finale-tag { font-size: clamp(18px,3.2vw,34px); font-weight: 700; opacity: 0; }
   .finale-tag.visible { animation: fadeUp .7s ease forwards; }
   .finale-tag .dim { color: var(--muted); }
-  .finale-brand { font-size: clamp(40px,9vw,110px); font-weight: 900; letter-spacing: -.04em; opacity: 0; }
+  .finale-brand { font-size: clamp(38px,8vw,104px); font-weight: 900; letter-spacing: -.03em; opacity: 0; }
   .finale-brand.visible { animation: slamIn .7s cubic-bezier(.2,1.3,.3,1) forwards; }
   .finale-sub { font-family: var(--mono); font-size: clamp(11px,1.8vw,16px); letter-spacing: .3em; text-transform: uppercase; color: var(--electric); opacity: 0; }
   .finale-sub.visible { animation: fadeUp .7s ease forwards; }
@@ -386,9 +383,6 @@ export function getCinematicTrailerHTML(): string {
     <div class="finale-tag" id="ft-0"><span class="dim">In the NEM, companies go bust every year.</span></div>
     <div class="finale-tag" id="ft-1" style="font-size:clamp(26px,5vw,58px);font-weight:900;margin-top:6px">Will you?</div>
     <div class="finale-brand glow-electric" id="ft-2" style="margin-top:22px">GRIDRIVAL<span style="opacity:.82">:</span> FULL POSITION</div>
-    <div class="verbs finale-verbs">
-      <span class="verb v0" id="fv-0">BID.</span><span class="verb v1" id="fv-1">POSITION.</span><span class="verb v2" id="fv-2">HEDGE.</span><span class="verb v3" id="fv-3">SURVIVE.</span>
-    </div>
   </div>
 
   <!-- call to action -->
@@ -396,9 +390,6 @@ export function getCinematicTrailerHTML(): string {
     <div class="cta-label" id="cta-0">Play it for real</div>
     <div class="cta-title" id="cta-1">Come play.</div>
     <div class="cta-event" id="cta-2"><span class="glow-gold">GridRival: Full Position</span> &middot; PD Team Day<span class="cta-date">September 1</span></div>
-    <div class="verbs cta-verbs">
-      <span class="verb v0" id="cv-0">BID.</span><span class="verb v1" id="cv-1">POSITION.</span><span class="verb v2" id="cv-2">HEDGE.</span><span class="verb v3" id="cv-3">SURVIVE.</span>
-    </div>
   </div>
 
   <div class="ticker-bar"><div class="ticker-content" id="tickerContent"></div></div>
@@ -591,14 +582,12 @@ export function getCinematicTrailerHTML(): string {
     [84300, () => showEl('ft-0')],
     [85800, () => { showEl('ft-1'); playImpact(); }],
     [87000, () => { showEl('ft-2'); playImpact(); }],
-    [87800, () => { for (let i=0;i<4;i++) setTimeout(()=>showEl('fv-'+i), i*140); }],
 
     // CALL TO ACTION — uplifting pings land here; lines arrive one at a time, "Come play." last
     [90000, () => { showScene('cta'); playRiser(1.2); startTriumphant(); }],
     [91000, () => showEl('cta-0')],   // PLAY IT FOR REAL
     [92900, () => showEl('cta-2')],   // GridRival · PD Team Day / September 1
     [95100, () => { showEl('cta-1'); playImpact(); }],   // Come play.  (the punch, last)
-    [95900, () => { for (let i=0;i<4;i++) setTimeout(()=>showEl('cv-'+i), i*140); }],   // BID. POSITION. HEDGE. SURVIVE.
   ];
 
   function getElapsed() { return paused ? pauseOffset : Date.now() - startTime + pauseOffset; }
